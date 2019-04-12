@@ -1,0 +1,127 @@
+void BnrOneA::lcd2(double number)
+{
+    int i,a;
+    int intg;
+	int dec;
+    byte buffer[19];
+    char string[20];
+	bool flag_neg=0;
+    
+	if (number<-0.0001)
+	{
+		flag_neg=1;
+		number*=-1.0;
+	}
+	dec = round((number-((double)(int)number))*100.0) % 100;
+	intg = (dec==0 ? round(number):(int)number);
+    a=sprintf(string,"%d.%02d            ",intg,dec);
+	
+    buffer[0]=KEY1;
+    buffer[1]=KEY2;
+	if (flag_neg==1)
+		buffer[2]='-';
+    for(i=0;i<16;i++){
+        buffer[i+2+flag_neg]=string[i];
+    }
+	
+    spiSendData(COMMAND_LCD_L2,buffer,sizeof(buffer));
+    delay(19);//Wait while command is processed
+}
+
+/*
+void BnrOneA::lcd1(double number)
+{
+    int i, a=0;
+    long int intg, dec;
+    byte buffer[19];
+    char string[17];
+    
+    intg=(long int)number;
+//	decimal=(valor-(double)inteiro)*1000000;
+    dec=(number-(double)intg)*1000000;
+//	printf("%d.%06d\n", inteiro, decimal);  
+    a=sprintf(string,"%d.%06d",intg,dec); // este imprime sempre com 6 casas decimais
+	Serial.println(a);
+    buffer[0]=KEY1;
+    buffer[1]=KEY2;
+    for(i=0;i<16;i++){
+        buffer[i+2]=string[i];
+    }
+  //  for(i=a;i<16;i++){
+ //       buffer[i+2]=(' ');
+  //  }
+    spiSendData(COMMAND_LCD_L1,buffer,sizeof(buffer));
+    delay(19);//Wait while command is processed
+}
+
+
+void BnrOneA::lcd1(double number)
+{
+    int i, a=0, zeros=0;
+    long int intg, dec;
+    byte buffer[19];
+    char string[17];
+	bool signal=0;
+
+    if(number<0)
+	{
+		number*=-1.0;
+		signal=1;
+	}
+    intg=(long int)number;
+	if(intg<10){
+        dec=(long int)(((number-intg)*100000)+1);
+		if(dec==100000) dec=0;
+		if(dec<99) zeros=3;
+		else if(dec<999) zeros=2;
+		else if(dec<9999) zeros=1;
+    }
+    else if(intg<100){
+        dec=(long int)(((number-intg)*10000)+1);
+		if(dec==10000) dec=0;
+		if(dec<9) zeros=3;
+		else if(dec<99) zeros=2;
+		else if(dec<999) zeros=1;
+    }
+    else{
+        dec=(long int)(((number-intg)*1000)+1);
+		if(dec==1000) dec=0;
+		if(dec<9) zeros=2;
+		else if(dec<99) zeros=1;
+    }
+    dec=(long int)(dec/10);
+	if(signal==0)
+	{
+		if(zeros==3)
+			a=sprintf(string,"%ld.000%ld",intg,dec);	
+		else if(zeros==2)
+			a=sprintf(string,"%ld.00%ld",intg,dec);	
+		else if(zeros==1)
+			a=sprintf(string,"%ld.0%ld",intg,dec);
+		else	
+		a=sprintf(string,"%ld.%ld",intg,dec);
+	}
+	else
+	{
+		if(zeros==3)
+			a=sprintf(string,"-%ld.000%ld",intg,dec);	
+		else if(zeros==2)
+			a=sprintf(string,"-%ld.00%ld",intg,dec);	
+		else if(zeros==1)
+			a=sprintf(string,"-%ld.0%ld",intg,dec);
+		else	
+		a=sprintf(string,"-%ld.%ld",intg,dec);
+	}
+		
+    buffer[0]=KEY1;
+    buffer[1]=KEY2;
+    for(i=0;i<16;i++){
+        buffer[i+2]=string[i];
+    }
+    for(i=a;i<16;i++){
+        buffer[i+2]=(' ');
+    }
+    spiSendData(COMMAND_LCD_L1,buffer,sizeof(buffer));
+    delay(19);//Wait while command is processed
+}
+*/

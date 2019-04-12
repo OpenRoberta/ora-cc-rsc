@@ -1,0 +1,43 @@
+#######################################
+# Syntax Coloring Map SD
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+BnrRescue	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+i2cConnect	KEYWORD2
+setModuleAddress	KEYWORD2
+setSonarStatus	KEYWORD2
+setRgbStatus	KEYWORD2
+readFirmware	KEYWORD2
+readSonars	KEYWORD2
+readRgbL	KEYWORD2
+readRgbR	KEYWORD2
+#######################################
+# Instances (KEYWORD2)
+#######################################
+brm	KEYWORD2
+rescue	KEYWORD2
+module	KEYWORD2
+#######################################
+# Constants (LITERAL1)
+#######################################
+MODULE_ADDRESS	LITERAL1
+BROADCAST_ADDRESS	LITERAL1
+COMMAND_FIRMWARE	LITERAL1
+COMMAND_RGBL	LITERAL1
+COMMAND_RGBR	LITERAL1
+COMMAND_SONARS	LITERAL1
+COMMAND_ADDRESS_CFG	LITERAL1
+COMMAND_SONAR_CFG	LITERAL1
+COMMAND_RGB_CFG	LITERAL1
+ON	LITERAL1
+OFF	LITERAL1
+ENABLE	LITERAL1
+DISABLE	LITERAL1

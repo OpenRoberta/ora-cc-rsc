@@ -1,0 +1,12 @@
+# Third-Party Libraries
+* [Arduino WiFi101 (WINC1500)](https://github.com/arduino-libraries/WiFi101)
+* [Arduino Ethernet (W5500)](https://github.com/arduino-libraries/Ethernet)
+* [Arduino ECCX08](https://github.com/arduino-libraries/ArduinoECCX08)
+* [Arduino BearSSL](https://github.com/arduino-libraries/ArduinoBearSSL)
+* [Adafruit Sensor](https://github.com/adafruit/Adafruit_Sensor)
+* [Adafruit BMP280](https://github.com/adafruit/Adafruit_BMP280_Library)
+* [Adafruit BMP3XX](https://github.com/adafruit/Adafruit_BMP3XX)
+* [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280_Library)
+* [Adafruit BME680](https://github.com/adafruit/Adafruit_BME680)
+* [Adafruit HDC1000](https://github.com/adafruit/Adafruit_HDC1000_Library)
+* [Matthijs Kooijman LMIC (RFM9X)](https://github.com/matthijskooijman/arduino-lmic)
