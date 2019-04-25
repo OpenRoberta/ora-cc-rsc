@@ -33,6 +33,18 @@
 #ifndef M_INFINITY
 #define M_INFINITY 0x7f800000
 #endif
+
+#define assertNepo(test, msg, left, op, right) ({ \
+    if (test == false) { \
+        ManagedString _assertMsg = ManagedString("Assertion failed: ") + ManagedString(msg) \
+        + ManagedString(" ") + ManagedString(left) + ManagedString(" ") + ManagedString(op) \
+        + ManagedString(" ") + ManagedString(right) + ManagedString("\r\n"); \
+        _uBit.serial.setTxBufferSize(_assertMsg.length()); \
+        _uBit.serial.send(_assertMsg); \
+        _uBit.sleep(_ITERATION_SLEEP_TIMEOUT); \
+    } \
+})
+
 #include <list>
 #include <array>
 
@@ -198,17 +210,6 @@ double _getListStandardDeviation(std::list<double> &list) {
 
 template <typename T, long unsigned S>
 std::array<T, S> _convertToArray(std::list<T> &list) {
-  auto iterator = list.begin();
-  std::array<T, S> result;
-  int i = 0;
-  for(auto iterator = list.begin(), i = 0; iterator != list.end(); ++iterator, ++i) {
-    result[i] = *iterator;
-  }
-  return result;
-}
-
-template <typename T, long unsigned S>
-std::array<T, S> _convertToArray(std::initializer_list<T> list) {
   auto iterator = list.begin();
   std::array<T, S> result;
   int i = 0;
