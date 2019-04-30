@@ -225,8 +225,8 @@ double _getListStandardDeviation(std::list<double> &list) {
     return sqrt(sum);
 }
 
-template <typename T>
-void assertNepo(bool test, String text, T left, String op, T right) {
+template <typename T,typename U>
+void assertNepo(bool test, String text, T left, String op, U right) {
     if (!test) {
         Serial.println("Assertion failed: " + text + " " + left + " " + op + " " + right);
         Serial.flush();
