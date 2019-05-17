@@ -100,7 +100,7 @@ class Hal(object):
             speed = 0
         elif speed > 100:
             speed = 100
-        speed *= 100
+        speed *= 10
         self.exec_command("SetMotor Brush RPM " + str(speed))
 
     def brush_off(self):
