@@ -23,15 +23,15 @@
 #endif
 
 #ifndef RCHANNEL(color)
-#define RCHANNEL(color) ((color >> 11) * 255 / 31)
+#define RCHANNEL(color) ((uint8_t)(color >> 16))
 #endif
 
 #ifndef GCHANNEL(color)
-#define GCHANNEL(color) ( ((color << 5) >> 10 ) * 255 / 63)
+#define GCHANNEL(color) ((uint8_t)(color >> 8))
 #endif
 
 #ifndef BCHANNEL(color)
-#define BCHANNEL(color) ( ((color << 11) >> 11 ) * 255 / 31)
+#define BCHANNEL(color) ((uint8_t)(color))
 #endif
 
 #ifndef _SENSEBOX_INCLUDES
@@ -42,14 +42,18 @@
 #include <math.h>
 
 #ifndef _BOB3_INCLUDES
-inline unsigned RGB(uint8_t r, uint8_t g, uint8_t b) {
-    return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b & 0xF8) >> 3));
+inline uint32_t RGB(uint8_t r, uint8_t g, uint8_t b) {
+    return (((uint32_t)(r)) << 16) | (((uint32_t)(g)) << 8) | ((uint32_t)(b));
 }
 #else
 inline unsigned RGB(unsigned r, unsigned g, unsigned b) {
     return ((r & 0xF0) << 4) | (g & 0xF0) | ((b & 0xF0) >> 4);
 }
 #endif
+
+//inline unsigned RGB(unsigned r, unsigned g, unsigned b) {
+//    return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b & 0xF8) >> 3));
+//}
 
 inline double absD(double d) {
     return d < 0.0 ? -d : d;
