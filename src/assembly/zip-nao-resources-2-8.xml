@@ -8,7 +8,7 @@
 	</formats>
 	<fileSets>
 		<fileSet>
-			<directory>RobotNAO/updateResources/v2-1/roberta</directory>
+			<directory>RobotNAO/updateResources/2-8/roberta</directory>
 			<outputDirectory>/</outputDirectory>
 		</fileSet>
 	</fileSets>

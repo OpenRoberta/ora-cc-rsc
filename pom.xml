@@ -244,31 +244,31 @@
 
 				<executions>
 					<execution>
-						<id>make-assembly-v2-1</id>
+						<id>make-assembly-2-1-4</id>
 						<phase>install</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>src/assembly/zip-nao-resources-v2-1.xml</descriptor>
+								<descriptor>src/assembly/zip-nao-resources-2-1-4.xml</descriptor>
 							</descriptors>
-							<outputDirectory>RobotNAO/updateResources/v2-1</outputDirectory>
+							<outputDirectory>RobotNAO/updateResources/2-1-4</outputDirectory>
 							<finalName>roberta</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 						</configuration>
 					</execution>
 					<execution>
-						<id>make-assembly-v2-8</id>
+						<id>make-assembly-2-8</id>
 						<phase>install</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 						<configuration>
 							<descriptors>
-								<descriptor>src/assembly/zip-nao-resources-v2-8.xml</descriptor>
+								<descriptor>src/assembly/zip-nao-resources-2-8.xml</descriptor>
 							</descriptors>
-							<outputDirectory>RobotNAO/updateResources/v2-8</outputDirectory>
+							<outputDirectory>RobotNAO/updateResources/2-8</outputDirectory>
 							<finalName>roberta</finalName>
 							<appendAssemblyId>false</appendAssemblyId>
 						</configuration>
