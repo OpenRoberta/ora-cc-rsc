@@ -36,6 +36,9 @@ void Bob3::init() {
   analog_init();
   leds_set_RGBx(1, OFF);
   leds_set_RGBx(2, OFF);
+  // initialize random number generator with physical random seed
+  delay(50); // wait to generate some analog random bits
+  srand(analog_getRandomSeed());
 }
 
 void Bob3::setLed(uint8_t id, uint16_t color) {
