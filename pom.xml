@@ -273,6 +273,21 @@
 							<appendAssemblyId>false</appendAssemblyId>
 						</configuration>
 					</execution>
+                                        <execution>
+						<id>make-assembly-raspberry</id>
+						<phase>install</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/assembly/zip-raspberry-resources.xml</descriptor>
+							</descriptors>
+							<outputDirectory>RobotRaspberryPi</outputDirectory>
+							<finalName>roberta</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
