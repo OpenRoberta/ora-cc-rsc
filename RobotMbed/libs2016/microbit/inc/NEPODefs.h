@@ -34,6 +34,14 @@
 #define M_INFINITY 0x7f800000
 #endif
 
+#ifndef _CB_20_ADDR
+#define _CB_20_ADDR (0x20 << 1)
+#endif
+
+#ifndef _CB_21_ADDR
+#define _CB_21_ADDR (0x21 << 1)
+#endif
+
 #define assertNepo(test, msg, left, op, right) ({ \
     if (test == false) { \
         ManagedString _assertMsg = ManagedString("Assertion failed: ") + ManagedString(msg) \
@@ -47,6 +55,7 @@
 
 #include <list>
 #include <array>
+#include <limits.h>
 
 inline double absD(double d) {
 	return d < 0.0 ? -d : d;
@@ -217,4 +226,139 @@ std::array<T, S> _convertToArray(std::list<T> &list) {
     result[i] = *iterator;
   }
   return result;
+}
+
+void _cbStop(MicroBitI2C *i2c) {
+    char buf[5] = { 0, 0, 0, 0, 0 };
+    // stop both motors
+    i2c->write(_CB_20_ADDR, buf, 5);
+}
+
+void _cbInit(MicroBitI2C *i2c, MicroBit *uBit) {
+    // stop both motors
+    _cbStop(i2c);
+    char buf[5] = { 0, 0, 0, 0, 0 };
+    // turn of both front leds
+    i2c->write(_CB_21_ADDR, buf, 2);
+    // turn of all rgb leds
+    buf[0] = 0x01;
+    i2c->write(_CB_21_ADDR, buf, 5);
+    uBit->sleep(_ITERATION_SLEEP_TIMEOUT);
+}
+
+int _getDistance(MicroBitColor current, MicroBitColor match) {
+    uint8_t redDist;
+    uint8_t greenDist;
+    uint8_t blueDist;
+
+    redDist = current.getRed() - match.getRed();
+    greenDist = current.getGreen() - match.getGreen();
+    blueDist = current.getBlue() - match.getBlue();
+
+    return (redDist * redDist) + (greenDist * greenDist) + (blueDist * blueDist);
+}
+
+uint8_t _findNearestColor(MicroBitColor current) {
+    MicroBitColor map[] = { MicroBitColor(0, 0, 0, 255), MicroBitColor(0, 153,
+            0, 255), MicroBitColor(255, 0, 0, 255), MicroBitColor(255, 255, 102,
+            255), MicroBitColor(51, 102, 255, 255), MicroBitColor(0, 204, 204,
+            255), MicroBitColor(102, 0, 204, 255), MicroBitColor(255, 255, 255,
+            255) };
+    int shortestDistance = INT_MAX;
+    uint8_t index = -1;
+
+    for (uint8_t i = 0; i < 8; i++) {
+        MicroBitColor match;
+        int distance;
+
+        match = map[i];
+        distance = _getDistance(current, match);
+
+        if (distance < shortestDistance) {
+            index = i;
+            shortestDistance = distance;
+        }
+    }
+    return index;
+}
+void _cbSetRGBLed(MicroBitI2C *i2c, uint8_t port, uint8_t colorIndex) {
+    char *buf;
+    uint8_t length = 2;
+    uint8_t color = 0x80 | colorIndex;
+    bool allLeds = false;
+    if (port == 5) { // all leds
+        buf = new char[5] { 0, 0, 0, 0, 0 };
+        length = 5;
+        port = 1;
+        buf[2] = color;
+        buf[3] = color;
+        buf[4] = color;
+    } else { // one specific led
+        buf = new char[2] { 0, 0 };
+    }
+    buf[0] = port;
+    buf[1] = color;
+    i2c->write(_CB_21_ADDR, buf, length);
+}
+
+void _cbSetRGBLed(MicroBitI2C *i2c, uint8_t port, MicroBitColor color) {
+    _cbSetRGBLed(i2c, port, _findNearestColor(color));
+}
+
+void _cbSetLed(MicroBitI2C *i2c, uint8_t &ledState, uint8_t port, bool on) {
+    char buf[2] = { 0, 0 };
+    if (on) {
+        ledState |= port;
+    } else {
+        ledState &= (0xFF - port);
+    }
+    buf[1] = ledState;
+    i2c->write(_CB_21_ADDR, buf, 2);
+}
+
+void _cbSetMotors(MicroBitI2C *i2c, int speedLeft, int speedRight) {
+    char buf[5] = { 0, 0, 0, 0, 0 };
+    if (speedLeft < 0) {
+        speedLeft *= -1;
+        buf[1] = 0x01;
+    }
+    if (speedLeft > 100) {
+        speedLeft = 100;
+    }
+    buf[2] = speedLeft * 2.55;
+    if (speedRight < 0) {
+        speedRight *= -1;
+        buf[3] = 0x01;
+    }
+    if (speedRight > 100) {
+        speedRight = 100;
+    }
+    buf[4] = speedRight * 2.55;
+    i2c->write(_CB_20_ADDR, buf, 5);
+}
+
+void _cbSetMotor(MicroBitI2C *i2c, uint8_t motor, int speed) {
+    char buf[3] = { 0, 0, 0 };
+    buf[0] = motor;
+    if (speed < 0) {
+        speed *= -1;
+        buf[1] = 0x01;
+    }
+    if (speed > 100) {
+        speed = 100;
+    }
+    buf[2] = speed * 2.55;
+    i2c->write(_CB_20_ADDR, buf, 3);
+}
+
+uint16_t _cbGetSampleUltrasonic(MicroBitI2C *i2c) {
+    char buf[3] = { 0, 0, 0 };
+    i2c->read(_CB_21_ADDR, buf, 3);
+    return (((buf[1] * 256) + buf[2]) * 0.1);
+}
+
+bool _cbGetSampleInfrared(MicroBitI2C *i2c, uint8_t sensor) {
+    char buf[1] = { 0 };
+    i2c->read(_CB_21_ADDR, buf, 1);
+    return ((buf[0] &= sensor) == 0 ? true : false);
 }
