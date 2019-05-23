@@ -58,35 +58,43 @@
 #include <limits.h>
 
 inline double absD(double d) {
-	return d < 0.0 ? -d : d;
+    return d < 0.0 ? -d : d;
 }
 
 inline bool isWholeD(double d) {
-	return d == floor(d);
+    return d == floor(d);
 }
 
 inline bool isPrimeD(double d) {
-	if (!isWholeD(d)) {
-		return false;
-	}
-	int n = (int) d;
-	if ( n < 2 ) { return false; }
-	if ( n == 2 ) { return true; }
-	if ( n % 2 == 0 ) { return false; }
-	for ( int i = 3, s = (int)(sqrt( d )+1); i <= s; i += 2 ) {
-		if ( n % i == 0 ) { return false; }
-	}
-	return true;
+    if (!isWholeD(d)) {
+        return false;
+    }
+    int n = (int) d;
+    if (n < 2) {
+        return false;
+    }
+    if (n == 2) {
+        return true;
+    }
+    if (n % 2 == 0) {
+        return false;
+    }
+    for (int i = 3, s = (int) (sqrt(d) + 1); i <= s; i += 2) {
+        if (n % i == 0) {
+            return false;
+        }
+    }
+    return true;
 }
 
-template <typename T>
+template<typename T>
 T _getListElementByIndex(std::list<T> &list, unsigned index) {
     auto iterator = list.begin();
     advance(iterator, index);
     return (*iterator);
 }
 
-template <typename T>
+template<typename T>
 T _getAndRemoveListElementByIndex(std::list<T> &list, unsigned index) {
     auto iterator = list.begin();
     advance(iterator, index);
@@ -95,18 +103,18 @@ T _getAndRemoveListElementByIndex(std::list<T> &list, unsigned index) {
     return value;
 }
 
-template <typename T>
+template<typename T>
 void _removeListElementByIndex(std::list<T> &list, unsigned index) {
     _getAndRemoveListElementByIndex(list, index);
 }
 
 /*
-* The only known situation where the cast of P to T would be needed is for int to double
-* in other cases T and P will be the same type. If only one template parameter is used
-* then the match void setListElementByIndex(std::list<double>, int, int) would not be possible
-*/
+ * The only known situation where the cast of P to T would be needed is for int to double
+ * in other cases T and P will be the same type. If only one template parameter is used
+ * then the match void setListElementByIndex(std::list<double>, int, int) would not be possible
+ */
 
-template <typename T, typename P>
+template<typename T, typename P>
 void _setListElementByIndex(std::list<T> &list, unsigned index, P value) {
     if (index < list.size()) {
         auto iterator = list.begin();
@@ -117,38 +125,41 @@ void _setListElementByIndex(std::list<T> &list, unsigned index, P value) {
     }
 }
 
-template <typename T, typename P>
-void _insertListElementBeforeIndex(std::list<T> &list, unsigned index, P value) {
+template<typename T, typename P>
+void _insertListElementBeforeIndex(std::list<T> &list, unsigned index,
+        P value) {
     auto iterator = list.begin();
     advance(iterator, index);
     list.insert(iterator, (T) (value));
 }
 
-template <typename T, typename P>
+template<typename T, typename P>
 int _getFirstOccuranceOfElement(std::list<T> &list, P value) {
     int i = 0;
     auto iterator = list.begin();
-    for(i = 0, iterator = list.begin(); iterator != list.end(); ++iterator, ++i) {
-      if ((P) (*iterator) == value) {
-        return i;
-      }
+    for (i = 0, iterator = list.begin(); iterator != list.end();
+            ++iterator, ++i) {
+        if ((P) (*iterator) == value) {
+            return i;
+        }
     }
     return -1;
 }
 
-template <typename T, typename P>
+template<typename T, typename P>
 int _getLastOccuranceOfElement(std::list<T> &list, P value) {
     int i = 0;
     auto iterator = list.rbegin();
-    for(i = 0, iterator = list.rbegin(); iterator != list.rend(); ++iterator, ++i) {
-      if ((P) (*iterator) == value) {
-        return list.size() - i - 1;
-      }
+    for (i = 0, iterator = list.rbegin(); iterator != list.rend();
+            ++iterator, ++i) {
+        if ((P) (*iterator) == value) {
+            return list.size() - i - 1;
+        }
     }
     return -1;
 }
 
-template <typename T>
+template<typename T>
 std::list<T> &_getSubList(std::list<T> &list, int startIndex, int endIndex) {
     auto beginIterator = list.begin();
     advance(beginIterator, startIndex);
@@ -159,7 +170,7 @@ std::list<T> &_getSubList(std::list<T> &list, int startIndex, int endIndex) {
 
 double _getListSum(std::list<double> &list) {
     double result = 0;
-    for(auto iterator = list.begin(); iterator != list.end(); ++iterator) {
+    for (auto iterator = list.begin(); iterator != list.end(); ++iterator) {
         result += *iterator;
     }
     return result;
@@ -167,7 +178,7 @@ double _getListSum(std::list<double> &list) {
 
 double _getListMin(std::list<double> &list) {
     double result = *(list.begin());
-    for(auto iterator = list.begin(); iterator != list.end(); ++iterator) {
+    for (auto iterator = list.begin(); iterator != list.end(); ++iterator) {
         if (result > *iterator) {
             result = *iterator;
         }
@@ -177,7 +188,7 @@ double _getListMin(std::list<double> &list) {
 
 double _getListMax(std::list<double> &list) {
     double result = *(list.begin());
-    for(auto iterator = list.begin(); iterator != list.end(); ++iterator) {
+    for (auto iterator = list.begin(); iterator != list.end(); ++iterator) {
         if (result < *iterator) {
             result = *iterator;
         }
@@ -189,13 +200,13 @@ double _getListMedian(std::list<double> &list) {
     std::list<double> sorted(list);
     sorted.sort();
     auto iterator = sorted.begin();
-    if( sorted.size() % 2 == 0 ) {
-        for( uint16_t i = 0 ; i < sorted.size() / 2 ; i ++ ) {
+    if (sorted.size() % 2 == 0) {
+        for (uint16_t i = 0; i < sorted.size() / 2; i++) {
             iterator++;
         }
-        return (*iterator + *--iterator ) / 2;
+        return (*iterator + *--iterator) / 2;
     } else {
-        for( uint16_t i = 0 ; i < sorted.size() / 2 ; i ++ ) {
+        for (uint16_t i = 0; i < sorted.size() / 2; i++) {
             iterator++;
         }
         return *iterator;
@@ -210,34 +221,39 @@ double _getListAverage(std::list<double> &list) {
 double _getListStandardDeviation(std::list<double> &list) {
     double mean = _getListSum(list) / list.size();
     double sum = 0;
-    for(auto iterator = list.begin(); iterator != list.end(); ++iterator) {
-        sum += (*iterator - mean)*(*iterator - mean);
+    for (auto iterator = list.begin(); iterator != list.end(); ++iterator) {
+        sum += (*iterator - mean) * (*iterator - mean);
     }
     sum /= list.size() - 1;
     return sqrt(sum);
 }
 
-template <typename T, long unsigned S>
+template<typename T, long unsigned S>
 std::array<T, S> _convertToArray(std::list<T> &list) {
-  auto iterator = list.begin();
-  std::array<T, S> result;
-  int i = 0;
-  for(auto iterator = list.begin(), i = 0; iterator != list.end(); ++iterator, ++i) {
-    result[i] = *iterator;
-  }
-  return result;
+    auto iterator = list.begin();
+    std::array<T, S> result;
+    int i = 0;
+    for (auto iterator = list.begin(), i = 0; iterator != list.end();
+            ++iterator, ++i) {
+        result[i] = *iterator;
+    }
+    return result;
 }
 
-void _cbStop(MicroBitI2C *i2c) {
-    char buf[5] = { 0, 0, 0, 0, 0 };
+void _cbStop(char buf[5], MicroBitI2C *i2c) {
+    for (uint8_t i = 0; i < 5; i++) {
+        buf[i] = 0;
+    }
     // stop both motors
     i2c->write(_CB_20_ADDR, buf, 5);
 }
 
-void _cbInit(MicroBitI2C *i2c, MicroBit *uBit) {
+void _cbInit(char buf[5], MicroBitI2C *i2c, MicroBit *uBit) {
+    for (uint8_t i = 0; i < 5; i++) {
+        buf[i] = 0;
+    }
     // stop both motors
-    _cbStop(i2c);
-    char buf[5] = { 0, 0, 0, 0, 0 };
+    _cbStop(buf, i2c);
     // turn of both front leds
     i2c->write(_CB_21_ADDR, buf, 2);
     // turn of all rgb leds
@@ -281,32 +297,31 @@ uint8_t _findNearestColor(MicroBitColor current) {
     }
     return index;
 }
-void _cbSetRGBLed(MicroBitI2C *i2c, uint8_t port, uint8_t colorIndex) {
-    char *buf;
+void _cbSetRGBLed(char buf[5], MicroBitI2C *i2c, uint8_t port,
+        uint8_t colorIndex) {
     uint8_t length = 2;
     uint8_t color = 0x80 | colorIndex;
     bool allLeds = false;
     if (port == 5) { // all leds
-        buf = new char[5] { 0, 0, 0, 0, 0 };
         length = 5;
         port = 1;
         buf[2] = color;
         buf[3] = color;
         buf[4] = color;
-    } else { // one specific led
-        buf = new char[2] { 0, 0 };
     }
     buf[0] = port;
     buf[1] = color;
     i2c->write(_CB_21_ADDR, buf, length);
 }
 
-void _cbSetRGBLed(MicroBitI2C *i2c, uint8_t port, MicroBitColor color) {
-    _cbSetRGBLed(i2c, port, _findNearestColor(color));
+void _cbSetRGBLed(char buf[5], MicroBitI2C *i2c, uint8_t port,
+        MicroBitColor color) {
+    _cbSetRGBLed(buf, i2c, port, _findNearestColor(color));
 }
 
-void _cbSetLed(MicroBitI2C *i2c, uint8_t &ledState, uint8_t port, bool on) {
-    char buf[2] = { 0, 0 };
+void _cbSetLed(char buf[5], MicroBitI2C *i2c, uint8_t &ledState, uint8_t port,
+        bool on) {
+    buf[0] = 0;
     if (on) {
         ledState |= port;
     } else {
@@ -316,11 +331,14 @@ void _cbSetLed(MicroBitI2C *i2c, uint8_t &ledState, uint8_t port, bool on) {
     i2c->write(_CB_21_ADDR, buf, 2);
 }
 
-void _cbSetMotors(MicroBitI2C *i2c, int speedLeft, int speedRight) {
-    char buf[5] = { 0, 0, 0, 0, 0 };
+void _cbSetMotors(char buf[5], MicroBitI2C *i2c, int speedLeft,
+        int speedRight) {
+    buf[0] = 0;
     if (speedLeft < 0) {
         speedLeft *= -1;
         buf[1] = 0x01;
+    } else {
+        buf[1] = 0x00;
     }
     if (speedLeft > 100) {
         speedLeft = 100;
@@ -329,6 +347,8 @@ void _cbSetMotors(MicroBitI2C *i2c, int speedLeft, int speedRight) {
     if (speedRight < 0) {
         speedRight *= -1;
         buf[3] = 0x01;
+    } else {
+        buf[3] = 0x00;
     }
     if (speedRight > 100) {
         speedRight = 100;
@@ -337,9 +357,9 @@ void _cbSetMotors(MicroBitI2C *i2c, int speedLeft, int speedRight) {
     i2c->write(_CB_20_ADDR, buf, 5);
 }
 
-void _cbSetMotor(MicroBitI2C *i2c, uint8_t motor, int speed) {
-    char buf[3] = { 0, 0, 0 };
+void _cbSetMotor(char buf[5], MicroBitI2C *i2c, uint8_t motor, int speed) {
     buf[0] = motor;
+    buf[1] = 0;
     if (speed < 0) {
         speed *= -1;
         buf[1] = 0x01;
@@ -351,14 +371,12 @@ void _cbSetMotor(MicroBitI2C *i2c, uint8_t motor, int speed) {
     i2c->write(_CB_20_ADDR, buf, 3);
 }
 
-uint16_t _cbGetSampleUltrasonic(MicroBitI2C *i2c) {
-    char buf[3] = { 0, 0, 0 };
+uint16_t _cbGetSampleUltrasonic(char buf[5], MicroBitI2C *i2c) {
     i2c->read(_CB_21_ADDR, buf, 3);
     return (((buf[1] * 256) + buf[2]) * 0.1);
 }
 
-bool _cbGetSampleInfrared(MicroBitI2C *i2c, uint8_t sensor) {
-    char buf[1] = { 0 };
+bool _cbGetSampleInfrared(char buf[5], MicroBitI2C *i2c, uint8_t sensor) {
     i2c->read(_CB_21_ADDR, buf, 1);
     return ((buf[0] &= sensor) == 0 ? true : false);
 }
