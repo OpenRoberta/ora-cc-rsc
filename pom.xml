@@ -15,6 +15,7 @@
 	<groupId>de.fhg.iais.openroberta</groupId>
 	<artifactId>ora-cc-rsc</artifactId>
 	<version>2</version>
+    <packaging>pom</packaging>
 	<name>ora-cc-rsc</name>
 	<description>project and repository containing all the crosscompiler-resources needed for all robots</description>
 	<properties>
