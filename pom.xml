@@ -274,7 +274,7 @@
 							<appendAssemblyId>false</appendAssemblyId>
 						</configuration>
 					</execution>
-                                        <execution>
+					<execution>
 						<id>make-assembly-raspberry</id>
 						<phase>install</phase>
 						<goals>
