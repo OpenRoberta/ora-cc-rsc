@@ -1,0 +1,16 @@
+define appv 'NEPO Launcher v0.1'
+
+vmthread  MAIN
+{
+  DATA32  Status
+  DATA32  Timer
+
+  // Executable file names which is going to be patched
+  SYSTEM('--executableName--', Status)
+
+  // After the executable has terminate, wait a little and then update the screen, otherwise the screen
+  // doesn't get refreshed and we don't see the ev3 menu
+  TIMER_WAIT(100, Timer)
+  TIMER_READY(Timer)
+  UI_DRAW(UPDATE)
+}
