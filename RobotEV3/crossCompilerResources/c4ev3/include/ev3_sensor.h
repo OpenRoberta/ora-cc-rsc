@@ -78,6 +78,11 @@ int SetAllSensorMode(int name_1, int name_2, int name_3, int name_4);
  */
 int SetIRBeaconCH(int sensorPort, int channel);
 
+
+int StartCompassCalibration ();
+
+int StopCompassCalibration ();
+
 /***********************************/
 // Sensor Names
 #define NO_SEN -1		// No sensor connected
@@ -93,20 +98,24 @@ int SetIRBeaconCH(int sensorPort, int channel);
 #define US_DIST_CM 5	// Dist in cm
 #define US_DIST_MM 6	// Dist in mm
 #define US_DIST_IN 7	// Dist in inch
+#define US_LISTEN  8	// Presence of other sensors
 
 //Gyroskop
-#define GYRO_ANG 8		// angle
-#define GYRO_RATE 9		// rate
+#define GYRO_ANG 9		// angle
+#define GYRO_RATE 10	// rate
 
 //Infrared
-#define IR_PROX 10		// Proximity
-#define IR_SEEK 11		// Seek
-#define IR_REMOTE 12	// Remote Control
+#define IR_PROX 11		// Proximity
+#define IR_SEEK 12		// Seek
+#define IR_REMOTE 13	// Remote Control
 
 //NXT 
 #define NXT_IR_SEEKER 20 // Infrared Seeker
-#define NXT_TEMP_C 21 	// Temperature in C
-#define NXT_TEMP_F 22 	// Temperature in F
+#define NXT_TEMP_C 21	 // Temperature in C
+#define NXT_TEMP_F 22	 // Temperature in F
+#define NXT_SOUND_DB 23  // Sound pressure level - Flat weighting
+#define NXT_SOUND_DBA 24 // Sound pressure level - A weighting
+#define NXT_COMPASS 25
 
 // Infrared Beacon Buttons
 #define BEACON_CH_1 0
@@ -154,17 +163,14 @@ int SetIRBeaconCH(int sensorPort, int channel);
 /*!
  * @deprecated
 */
-#define setSensorMode(_sensorPort, _name) SetSensorMode(_sensorPort, _name)
-
-/*!
- * @deprecated
-*/
 #define setAllSensorMode(_name_1, _name_2, _name_3, _name_4) SetAllSensorMode(_name_1, _name_2, _name_3, _name_4)
 
 /*!
  * @deprecated
 */
 #define setIRBeaconCH(_sensorPort, _channel) SetIRBeaconCH(_sensorPort, _channel)
+
+int GetSensorName (int port);
 
 
 #endif // EV3SENSOR_H
