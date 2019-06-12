@@ -78,11 +78,6 @@ int SetAllSensorMode(int name_1, int name_2, int name_3, int name_4);
  */
 int SetIRBeaconCH(int sensorPort, int channel);
 
-
-int StartCompassCalibration ();
-
-int StopCompassCalibration ();
-
 /***********************************/
 // Sensor Names
 #define NO_SEN -1		// No sensor connected
@@ -115,7 +110,6 @@ int StopCompassCalibration ();
 #define NXT_TEMP_F 22	 // Temperature in F
 #define NXT_SOUND_DB 23  // Sound pressure level - Flat weighting
 #define NXT_SOUND_DBA 24 // Sound pressure level - A weighting
-#define NXT_COMPASS 25
 
 // Infrared Beacon Buttons
 #define BEACON_CH_1 0
@@ -170,7 +164,10 @@ int StopCompassCalibration ();
 */
 #define setIRBeaconCH(_sensorPort, _channel) SetIRBeaconCH(_sensorPort, _channel)
 
+
 int GetSensorName (int port);
+
+void ResetGyroSensor (int port);
 
 
 #endif // EV3SENSOR_H
