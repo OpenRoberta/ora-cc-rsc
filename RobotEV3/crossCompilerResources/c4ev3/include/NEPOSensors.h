@@ -1,3 +1,6 @@
+#ifndef NEPOSENSORS
+#define NEPOSENSORS
+
 #define DEFAULT_MODE_COLOR      COL_COLOR
 #define DEFAULT_MODE_GYRO       GYRO_ANG
 #define DEFAULT_MODE_INFRARED   IR_PROX
@@ -13,3 +16,5 @@ inline int ReadSensorInMode (int port, int mode) {
     }
     return readSensor(port);
 }
+
+#endif

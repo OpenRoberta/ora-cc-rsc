@@ -1,3 +1,6 @@
+#ifndef NEPOMOTORS
+#define NEPOMOTORS
+
 #define SPEED_MAX 100
 
 inline int Speed(float speed) {
@@ -81,3 +84,5 @@ inline void WaitMotorToReachAngle(int motorPort, float speed, int angle) {
         }
     }
 }
+
+#endif
