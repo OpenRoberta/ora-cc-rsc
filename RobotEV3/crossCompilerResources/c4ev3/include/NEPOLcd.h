@@ -23,4 +23,9 @@ inline void LcdTextColor (int color, int x, int y) {
 	LcdTextf(TEXT_COLOR_BLACK, x, y, getColorName(color));
 }
 
+
+#define EYESOPEN "/home/root/lms2012/prjs/BrkProg_SAVE/NEPO-EYESOPEN.bmp"
+#define OLDGLASSES "/home/root/lms2012/prjs/BrkProg_SAVE/NEPO-EYESOPEN.bmp"
+
+
 #endif

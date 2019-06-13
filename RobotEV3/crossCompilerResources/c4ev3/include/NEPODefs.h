@@ -3,4 +3,5 @@
 #include "NEPOMotors.h"
 #include "NEPOSensors.h"
 #include "NEPOLcd.h"
+#include "NEPOSound.h"
 #include "NEPOLists.h"

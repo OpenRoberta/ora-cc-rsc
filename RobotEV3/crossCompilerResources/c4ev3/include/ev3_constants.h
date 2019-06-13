@@ -105,6 +105,8 @@ extern "C" {
 
 /** @} */  // end of InputPortConstants group
 
+#define IR_CHANNELS 4
+
 
 /** @defgroup OutModeConstants Output port mode constants
  * Use these constants to configure the desired mode for the
