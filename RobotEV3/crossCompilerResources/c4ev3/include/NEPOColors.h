@@ -2,8 +2,8 @@
 #define NEPOCOLORS
 
 /* Colors not already defined in c4ev3 library */
-#ifndef INPUT_MAGENTACOLOR
-#define INPUT_MAGENTACOLOR 7
+#ifndef INPUT_BROWNCOLOR
+#define INPUT_BROWNCOLOR 7
 #endif
 
 #ifndef INPUT_ORANGECOLOR
@@ -28,6 +28,8 @@
 
 char * getColorName (int color) {
 	switch(color) {
+	    case 0:
+	        return "Transparent";
 	    case 1:
 	      return "Black";
 	    case 2:
@@ -41,7 +43,7 @@ char * getColorName (int color) {
 	    case 6:
 	      return "White";
 	    case 7:
-	      return "Magenta";
+	      return "Brown";
 	    case 8:
 	      return "Orange";
 	    case 9:
