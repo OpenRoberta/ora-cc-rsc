@@ -1,9 +1,18 @@
-static int _soundVolume = 100;
+static int NEPOSoundVolume = 100;
 
 inline void SetVolume(int volume) {
-    _soundVolume = volume;
+    NEPOSoundVolume = volume;
 }
 
-inline void _PlaySound (int soundName) {
-    PlaySoundEx(soundName, _soundVolume);
+inline int GetVolume() {
+    return NEPOSoundVolume;
+}
+
+inline void PlaySystemSound (int soundName) {
+    PlaySoundEx(soundName, NEPOSoundVolume);
+}
+
+inline void PlayNote (unsigned short frequency, unsigned short duration) {
+    PlayToneEx(frequency, duration, NEPOSoundVolume);
+    Wait(duration);
 }

@@ -197,4 +197,7 @@ int* ReadIRSeekAllChannels(int port);
 
 int ReadCompass (int port);
 
+
+int FaiCose (int port);
+
 #endif // EV3SENSOR_H

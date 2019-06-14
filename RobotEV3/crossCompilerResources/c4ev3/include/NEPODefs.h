@@ -1,3 +1,7 @@
+#include <string>
+
+#define String std::string // Hack to reuse the String type defined in AbstractCppVisitor
+
 #include "NEPOColors.h"
 #include "NEPOMath.h"
 #include "NEPOMotors.h"
