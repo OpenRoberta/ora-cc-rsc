@@ -26,7 +26,7 @@
 #define INPUT_PURPLECOLOR 12
 #endif
 
-char * getColorName (int color) {
+String GetColorName (int color) {
 	switch(color) {
 	    case 0:
 	        return "Transparent";

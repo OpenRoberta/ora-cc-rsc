@@ -3,8 +3,8 @@
 
 #define SPEED_MAX 100
 
-inline int Speed(float speed) {
-    return MathMax(-SPEED_MAX, MathMin(speed, SPEED_MAX));
+inline int Speed(int speed) {
+    return std::max(-SPEED_MAX, std::min(speed, SPEED_MAX));
 }
 
 /**

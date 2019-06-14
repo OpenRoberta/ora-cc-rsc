@@ -1,6 +1,7 @@
 #ifndef NEPOSENSORS
 #define NEPOSENSORS
 
+#include "ev3_timer.h"
 #include "NEPOLists.h"
 
 #define DEFAULT_MODE_COLOR      COL_COLOR
@@ -11,6 +12,8 @@
 #define DEFAULT_MODE_SOUND      NXT_SOUND_DB
 #define DEFAULT_MODE_COMPASS    NXT_COMPASS
 #define DEFAULT_MODE_IRSEEKER   IR_SEEK
+
+#define TIMERS_COUNT 5
 
 inline void switchToMode(int port, int mode) {
     if (GetSensorName(port) != mode) {
@@ -23,18 +26,18 @@ inline int ReadSensorInMode (int port, int mode) {
     return readSensor(port);
 }
 
-inline std::list<double> & ReadColorSensorRGB (int port) {
+inline std::list<double> ReadColorSensorRGB (int port) {
     int rgb = ReadSensorInMode(port, COL_RGB);
-    static std::list<double> values;
+    std::list<double> values;
     _setListElementByIndex(values, 0, GetRFromRGB(rgb) / 255.0);
     _setListElementByIndex(values, 1, GetGFromRGB(rgb) / 255.0);
     _setListElementByIndex(values, 2, GetBFromRGB(rgb) / 255.0);
     return values;
 }
 
-inline std::list<double> & _ReadIRSeekAllChannels (int port) {
+inline std::list<double> _ReadIRSeekAllChannels (int port) {
     switchToMode(port, IR_SEEK);
-    static std::list<double> valuesInList;
+    std::list<double> valuesInList;
     int * values = ReadIRSeekAllChannels(port);
     for (int i = 0; i < IR_CHANNELS; i++) {
         int measurement = values[i * 2];
@@ -44,5 +47,18 @@ inline std::list<double> & _ReadIRSeekAllChannels (int port) {
     }
     return valuesInList;
 }
+
+
+
+unsigned long long NEPOTimers[TIMERS_COUNT];
+
+
+inline void ResetTimer (int stopwatch) {
+    NEPOTimers[stopwatch] = TimerGetMS();
+}
+
+inline unsigned long long GetTimerValue (int stopwatch) {
+    return TimerGetMS() - NEPOTimers[stopwatch];
+};
 
 #endif

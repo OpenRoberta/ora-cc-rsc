@@ -232,8 +232,14 @@ char RectOutEx(int x, int y, int width, int height, unsigned long options);
 char EllipseOutEx(int x, int y, uint8_t radiusX, uint8_t radiusY, unsigned long options);
 #define EllipseOut(_x, _y, _rx, _ry) EllipseOutEx((_x), (_y), (_rx), (_ry), DRAW_OPT_NORMAL)
 
+
 bool LcdTextf(char Color, short X, short Y, const char *fmt, ...);
+
+
 int LcdPrintf(char __color, const char * __fmt, ...);
+
+int LcdPrintln(char __color, const char * __fmt, ...);
+
 
 #ifdef __ASPRINTF
 #include <stdarg.h>
@@ -241,10 +247,7 @@ int asprintf(char **, const char *, ...);
 int vasprintf(char **, const char *, va_list)
 #endif
 
-/**
- * Print formatted text on the display. Works like the normal printf.
- * 
- */
+
 int Ev3Printf(const char *fmt, ...);
 
 /**
@@ -269,6 +272,9 @@ int TermPrintf(const char *fmt, ...);
  * text from being out of bounds.
  */
 int TermPrintln(const char *fmt, ...);
+
+void SetCursorX(short x);
+void SetCursorY(short y);
 
 #endif // ev3_lcd_h
 

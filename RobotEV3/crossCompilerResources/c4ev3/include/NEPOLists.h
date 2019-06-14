@@ -23,6 +23,7 @@ T _getListElementByIndex(std::list<T> &list, unsigned index) {
     return (*iterator);
 }
 
+
 template<typename T>
 T _getAndRemoveListElementByIndex(std::list<T> &list, unsigned index) {
     auto iterator = list.begin();
@@ -95,11 +96,6 @@ std::list<T> &_getSubList(std::list<T> &list, int startIndex, int endIndex) {
     auto endIterator = list.begin();
     advance(endIterator, endIndex + 1);
     return *(new std::list<T>(beginIterator, endIterator));
-}
-
-template<typename T>
-void _copyList(std::list<T> &source, std::list<T> &dest) {
-    dest.assign(source.begin(), source.end());
 }
 
 double _getListSum(std::list<double> &list) {
