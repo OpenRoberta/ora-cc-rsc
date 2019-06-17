@@ -26,6 +26,7 @@ void onNEPOProgramJustUploaded () {
     PlaySound(SOUND_DOUBLE_BEEP);
     Wait(1000);
     deleteJustUploadedFlag();
+    FreeEV3();
     exit(0);
 }
 
