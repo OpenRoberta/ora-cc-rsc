@@ -240,6 +240,18 @@ std::array<T, S> _convertToArray(std::list<T> &list) {
     return result;
 }
 
+template<typename T, long unsigned S>
+std::array<T, S> _convertToArray(std::initializer_list<T> list) {
+    auto iterator = list.begin();
+    std::array<T, S> result;
+    int i = 0;
+    for (auto iterator = list.begin(), i = 0; iterator != list.end();
+            ++iterator, ++i) {
+        result[i] = *iterator;
+    }
+    return result;
+}
+
 void _cbStop(char buf[5], MicroBitI2C *i2c) {
     for (uint8_t i = 0; i < 5; i++) {
         buf[i] = 0;
@@ -379,4 +391,10 @@ uint16_t _cbGetSampleUltrasonic(char buf[5], MicroBitI2C *i2c) {
 bool _cbGetSampleInfrared(char buf[5], MicroBitI2C *i2c, uint8_t sensor) {
     i2c->read(_CB_21_ADDR, buf, 1);
     return ((buf[0] &= sensor) == 0 ? true : false);
+}
+
+ManagedString _castColorToString(MicroBitColor color) {
+    return (ManagedString("RGBW(") + color.getRed() + ManagedString(", ")
+            + color.getGreen() + ManagedString(", ") + color.getBlue()
+            + ManagedString(", ") + color.getWhite() + ManagedString(")"));
 }
