@@ -9,3 +9,4 @@
 #include "NEPOLcd.h"
 #include "NEPOSound.h"
 #include "NEPOLists.h"
+#include "NEPOInit.h"
