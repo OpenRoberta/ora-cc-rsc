@@ -35,6 +35,13 @@ inline std::list<double> ReadColorSensorRGB (int port) {
     return values;
 }
 
+
+inline Color ReadColorSensor (int port) {
+    int c4ev3 = ReadSensorInMode(port, COL_COLOR);
+    return GetColorFromC4ev4Int(c4ev3);
+}
+
+
 inline std::list<double> _ReadIRSeekAllChannels (int port) {
     switchToMode(port, IR_SEEK);
     std::list<double> valuesInList;

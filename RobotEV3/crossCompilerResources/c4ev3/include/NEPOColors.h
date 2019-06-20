@@ -1,6 +1,8 @@
 #ifndef NEPOCOLORS
 #define NEPOCOLORS
 
+enum Color { Transparent, Black, Blue, Green, Yellow, Red, White, Brown, Orange, Lime, Violet, Crimson, Purple, Grey };
+
 /* Colors not already defined in c4ev3 library */
 #ifndef INPUT_BROWNCOLOR
 #define INPUT_BROWNCOLOR 7
@@ -26,42 +28,76 @@
 #define INPUT_PURPLECOLOR 12
 #endif
 
-String GetColorName (int color) {
+std::string GetColorName (Color color) {
 	switch(color) {
-	    case 0:
+	    case Transparent:
 	        return "Transparent";
-	    case 1:
+	    case Black:
 	      return "Black";
-	    case 2:
+	    case Blue:
 	      return "Blue";
-	    case 3:
+	    case Green:
 	      return "Green";
-	    case 4:
+	    case Yellow:
 	      return "Yellow";
-	    case 5:
+	    case Red:
 	      return "Red";
-	    case 6:
+	    case White:
 	      return "White";
-	    case 7:
+	    case Brown:
 	      return "Brown";
-	    case 8:
+	    case Orange:
 	      return "Orange";
-	    case 9:
+	    case Lime:
 	      return "Lime";
-	    case 10:
+	    case Violet:
 	      return "Violet";
-	    case 11:
+	    case Crimson:
 	      return "Crimson";
-	    case 12:
+	    case Purple:
 	      return "Purple";
+	    case Grey:
+	    default:
+	      return "Grey";
+  }
+}
+
+Color GetColorFromC4ev4Int (int c4ev3Color) {
+    switch(c4ev3Color) {
+	    case 0:
+	        return Transparent;
+	    case 1:
+	      return Black;
+	    case 2:
+	      return Blue;
+	    case 3:
+	      return Green;
+	    case 4:
+	      return Yellow;
+	    case 5:
+	      return Red;
+	    case 6:
+	      return White;
+	    case 7:
+	      return Brown;
+	    case 8:
+	      return Orange;
+	    case 9:
+	      return Lime;
+	    case 10:
+	      return Violet;
+	    case 11:
+	      return Crimson;
+	    case 12:
+	      return Purple;
 	    case 13:
 	    case 14:
 	    case 15:
 	    case 16:
 	    case 17:
-	      return "White";
+	      return White;
 	    default:
-	      return "Grey";
+	      return Grey;
   }
 }
 
