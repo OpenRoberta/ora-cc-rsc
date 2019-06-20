@@ -16,7 +16,8 @@ void inline NEPOInitEV3 () {
 }
 
 bool NEPOProgramJustUploaded () {
-     return access(JUST_UPLOADED_FLAG_FILE_NAME, F_OK) == 0;
+     return false;
+     //return access(JUST_UPLOADED_FLAG_FILE_NAME, F_OK) == 0;
 }
 
 
