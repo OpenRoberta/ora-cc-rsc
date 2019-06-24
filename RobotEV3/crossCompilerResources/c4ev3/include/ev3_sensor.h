@@ -106,13 +106,14 @@ int SetIRBeaconCH(int sensorPort, int channel);
 #define IR_REMOTE 14	        // Remote Control
 
 //NXT 
-#define NXT_IR_SEEKER_DC 20 // Infrared Seeker DC signal
-#define NXT_IR_SEEKER_AC 21 // Infrared Seeker AC signal
-#define NXT_TEMP_C 22	    // Temperature in C
-#define NXT_TEMP_F 23	    // Temperature in F
-#define NXT_SOUND_DB 24     // Sound pressure level - Flat weighting
-#define NXT_SOUND_DBA 25    // Sound pressure level - A weighting
-#define NXT_COMPASS 26
+#define NXT_IR_SEEKER_DC 20 	// Infrared Seeker DC signal
+#define NXT_IR_SEEKER_AC 21 	// Infrared Seeker AC signal
+#define NXT_TEMP_C 22	    	// Temperature in C
+#define NXT_TEMP_F 23	    	// Temperature in F
+#define NXT_SOUND_DB 24     	// Sound pressure level - Flat weighting
+#define NXT_SOUND_DBA 25    	// Sound pressure level - A weighting
+#define NXT_COMPASS_COMPASS 26	// compass with values from 0 to 360
+#define NXT_COMPASS_ANGLE 27	// compass with values from -180 to 180
 
 // Infrared Beacon Buttons
 #define BEACON_CH_1 0
@@ -132,6 +133,8 @@ int SetIRBeaconCH(int sensorPort, int channel);
 #define BEACON_LEFT 		10
 #define BEACON_RIGHT 		11
 
+
+#define IR_CHANNELS 4
 
 /**
  * COMPATIBILITY FUNCTION NAMES
@@ -191,13 +194,24 @@ int GetGFromRGB(int rgb);
 int GetBFromRGB(int rgb);
 
 /**
+ * Read the seek value for all the channels.
+ * The returned array contains 8 integers, two values for each channel:
+ * - position value (-25 - 25)
+ * - raw value
  *
+ * If no beacon is detected, raw value is 128.
+ *
+ * NOTE: This function returns a pointer to a static array. If you need to remember
+ * old values, you'll need to copy them from the array before calling this function,
+ * since the  array will be modified.
+ * @param port
+ * @return
  */
 int* ReadIRSeekAllChannels(int port);
 
-int ReadCompass (int port);
 
+void StartHTCompassCalibration(int sensorPort);
 
-int FaiCose (int port);
+void StopHTCompassCalibration(int sensorPort);
 
 #endif // EV3SENSOR_H
