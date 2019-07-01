@@ -56,6 +56,7 @@ void * escapeSequenceMonitor (void * arguments) {
         Wait(POOL_ESCAPE_SEQUENCE);
     }
     NEPOFreeEV3();
+    return NULL;
 }
 
 bool isEscapeSequence () {

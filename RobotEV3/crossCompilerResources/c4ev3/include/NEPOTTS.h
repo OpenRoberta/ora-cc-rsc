@@ -8,7 +8,7 @@ int generateAudioFile (std::string text, std::string language, int speed, int pi
 
 inline void Say (std::string text, std::string language, int speed, int pitch) {
     generateAudioFile(text, language, speed, pitch);
-    PlayFileEx(GENERATED_AUDIO_FILE, GetVolume(), false);
+    PlayFileEx((char *) GENERATED_AUDIO_FILE, GetVolume(), false);
 }
 
 
