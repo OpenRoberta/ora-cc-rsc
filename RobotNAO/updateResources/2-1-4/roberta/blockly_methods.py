@@ -26,7 +26,9 @@ class BlocklyMethods:
 
     @staticmethod
     def isPrime(number):
-        for i in range(2, math.sqrt(number)):
+        if(number == 0 or number == 1):
+            return False
+        for i in range(2, int(math.floor(math.sqrt(number)))+1):
             remainder = number % i
             if remainder == 0:
                 return False
