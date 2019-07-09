@@ -10,6 +10,7 @@
 #include "NEPOLists.h"
 #include "NEPOInit.h"
 #include "NEPOTTS.h"
+#include "NEPOBluetooth.h"
 
 template<typename T, typename U>
 void assertNepo(bool test, std::string text, T left, std::string op, U right) {
