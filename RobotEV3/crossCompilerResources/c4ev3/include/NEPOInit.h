@@ -11,12 +11,19 @@ bool NEPOProgramJustUploaded();
 void onNEPOProgramJustUploaded ();
 void startThreadToMonitorEscapeSequence();
 
+bool initialized = false;
+
 void inline NEPOInitEV3 () {
+    if (initialized) {
+        return;
+    }
+    initialized = true;
     InitEV3();
     if (NEPOProgramJustUploaded()) {
         onNEPOProgramJustUploaded();
     }
     startThreadToMonitorEscapeSequence();
+    SetLedPattern(LED_GREEN_PULSE);
 }
 
 void inline NEPOFreeEV3 () {
@@ -56,6 +63,7 @@ void * escapeSequenceMonitor (void * arguments) {
         Wait(POOL_ESCAPE_SEQUENCE);
     }
     NEPOFreeEV3();
+    initialized = false;
     return NULL;
 }
 
