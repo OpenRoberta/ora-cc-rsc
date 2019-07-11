@@ -50,7 +50,7 @@ inline void SteerDriveForDistance(int portLeft, int portRight, float speedLeft, 
 inline float computeOuterCircumferenceForSteerDrive (float speedLeft, float speedRight, float distance) {
     if (speedLeft + speedRight == 0) {
         return distance;
-    } else if (abs(speedLeft) < abs(speedRight)) {
+    } else if (abs(speedLeft) > abs(speedRight)) {
         return speedLeft / (speedRight + speedLeft) * 2.0 * distance;
     } else {
         return speedRight / (speedRight + speedLeft) * 2.0 * distance;

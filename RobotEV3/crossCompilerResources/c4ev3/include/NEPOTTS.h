@@ -4,22 +4,28 @@
 #define SYNTHETIZE_SCIRPT_FILE_NAME "/media/card/NEPO-TTS/synthetize.sh"
 #define GENERATED_AUDIO_FILE "/media/card/NEPO-TTS/tmp/output.wav"
 
-int generateAudioFile (std::string text, std::string language, int speed, int pitch);
+static std::string language = "en";
 
-inline void Say (std::string text, std::string language, int speed, int pitch) {
-    generateAudioFile(text, language, speed, pitch);
+void SetLanguage(std::string toSet) {
+    language = toSet;
+}
+
+int generateAudioFile (std::string text, int speed, int pitch);
+
+inline void Say (std::string text, int speed, int pitch) {
+    generateAudioFile(text, speed, pitch);
     PlayFileEx((char *) GENERATED_AUDIO_FILE, GetVolume(), false);
 }
 
 
-inline void Say (std::list<std::string> strings, std::string language, int speed, int pitch) {
+inline void Say (std::list<std::string> strings, int speed, int pitch) {
     for (auto str : strings) {
-        Say(str, language, speed, pitch);
+        Say(str, speed, pitch);
     }
 }
 
 
-inline int  generateAudioFile (std::string text, std::string language, int speed, int pitch)  {
+inline int  generateAudioFile (std::string text, int speed, int pitch)  {
     // TODO: Fix escaping
      std::string cmd = SYNTHETIZE_SCIRPT_FILE_NAME;
      cmd += " ";
