@@ -5,7 +5,7 @@
 #include "NEPOPictures.h"
 
 #define LCD_COLOR_BLACK 1
-#define DEFAULT_FONT_CHARACTER_HEIGHT 9
+#define DEFAULT_FONT_CHARACTER_HEIGHT 10
 #define DEFAULT_FONT_CHARACTER_WIDTH 8
 
 void SetCursorColumn (int column) {
