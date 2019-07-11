@@ -26,6 +26,7 @@ namespace std {
     std::string to_string (Color color) {
         return GetColorName(color);
     }
+   
 }
 
 #endif

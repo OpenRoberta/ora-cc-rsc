@@ -12,7 +12,7 @@ inline void PlaySystemSound (int soundName) {
     PlaySoundEx(soundName, NEPOSoundVolume);
 }
 
-inline void PlayNote (unsigned short frequency, unsigned short duration) {
+inline void NEPOPlayTone (unsigned short frequency, unsigned short duration) {
     PlayToneEx(frequency, duration, NEPOSoundVolume);
     Wait(duration);
 }

@@ -5,18 +5,27 @@
 #include "NEPOPictures.h"
 
 #define LCD_COLOR_BLACK 1
+#define DEFAULT_FONT_CHARACTER_HEIGHT 9
+#define DEFAULT_FONT_CHARACTER_WIDTH 8
 
+void SetCursorColumn (int column) {
+    SetCursorX(column * DEFAULT_FONT_CHARACTER_WIDTH);
+}
 
-void DrawString (std::string str, int x, int y) {
-    SetCursorX(x);
-    SetCursorY(y);
+void SetCursorRow (int row) {
+    SetCursorY(row * DEFAULT_FONT_CHARACTER_HEIGHT);
+}
+
+void DrawString (std::string str, int column, int row) {
+    SetCursorColumn(column);
+    SetCursorRow(row);
     LcdPrintf(LCD_COLOR_BLACK, "%s", str.c_str());
 }
 
 template<typename T>
-void DrawString (std::list<T> strings, int x, int y) {
-    SetCursorX(x);
-    SetCursorY(y);
+void DrawString (std::list<T> strings, int column, int row) {
+    SetCursorColumn(column);
+    SetCursorRow(row);
     int counter = 0;
     for (auto str : strings) {
         LcdPrintf(LCD_COLOR_BLACK, "%s ", ToString(str).c_str());

@@ -27,6 +27,7 @@ void inline NEPOInitEV3 () {
 }
 
 void inline NEPOFreeEV3 () {
+    SetLedPattern(LED_GREEN);
     FreeEV3();
     exit(0);
 }
