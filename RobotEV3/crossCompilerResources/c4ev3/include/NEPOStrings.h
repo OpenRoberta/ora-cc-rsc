@@ -7,26 +7,34 @@
 
 namespace std {
 
-    std::string to_string (std::string str) {
+    string to_string (string str) {
         return str;
     }
 
-    std::string to_string (const char * str) {
+    string to_string (const char * str) {
         return str;
     }
 
-    std::string to_string (bool b) {
-        return b ? "true" : "false";
+    string to_string (bool b) {
+            return b ? "true" : "false";
     }
 
-    std::list<std::string> to_string (std::initializer_list<std::string> strings) {
+    list<std::string> to_string (initializer_list<string> strings) {
         return strings;
     }
 
-    std::string to_string (Color color) {
+    string to_string (Color color) {
         return GetColorName(color);
     }
-   
+
+
+    list<string> to_string (list<double> numbers) {
+        list<string> strings;
+        for (double number : numbers) {
+            strings.push_back(ToString(number));
+        }
+        return strings;
+    }
 }
 
 #endif
