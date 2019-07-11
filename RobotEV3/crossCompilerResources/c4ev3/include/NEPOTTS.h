@@ -1,8 +1,8 @@
 #ifndef NEPOTTS
 #define NEPOTTS
 
-#define SYNTHETIZE_SCIRPT_FILE_NAME "/media/card/NEPO-TTS/synthetize.sh"
-#define GENERATED_AUDIO_FILE "/media/card/NEPO-TTS/tmp/output.wav"
+#define ESPEAK_PATH "/media/card/NEPO-TTS"
+#define GENERATED_AUDIO_FILE "/media/card/NEPO-TTS/output.wav"
 
 static std::string language = "en";
 
@@ -26,19 +26,17 @@ inline void Say (std::list<std::string> strings, int speed, int pitch) {
 
 
 inline int  generateAudioFile (std::string text, int speed, int pitch)  {
-    // TODO: Fix escaping
-     std::string cmd = SYNTHETIZE_SCIRPT_FILE_NAME;
-     cmd += " ";
-     cmd += language;
+     std::string cmd = "LD_LIBRARY_PATH=\"" + (std::string) ESPEAK_PATH + "\" ";
+     cmd += ESPEAK_PATH + (std::string) "/speak-ng";
+     cmd += " -v " + language;
+     cmd += " -s " + (std::string) ToString(speed);
+     cmd += " -p " + (std::string) ToString(pitch);
+     cmd += " -w " + (std::string) GENERATED_AUDIO_FILE;
      cmd += " \"";
      cmd += text;
-     cmd += "\" ";
-     cmd += ToString(speed);
-     cmd += " ";
-     cmd += ToString(pitch);
+     cmd += "\""; // TODO: Improve escaping
 
      return system(cmd.c_str());
-
 }
 
 
