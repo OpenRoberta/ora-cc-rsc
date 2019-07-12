@@ -72,4 +72,18 @@ bool isEscapeSequence () {
     return ButtonIsDown(BTNCENTER) && ButtonIsDown(BTNDOWN);
 }
 
+void NEPOError (std::string error, std::string message) {
+    SetLedPattern(LED_RED);
+    LcdClean();
+    DrawString("ERROR", 8, 2);
+    DrawString(error.c_str(), 10 - (error.length() / 2), 4);
+    DrawString(message.c_str(), 0, 8);
+    DrawString("CENTER + DOWN to exit", 1, 11);
+    PlaySystemSound(SOUND_LOW_BEEP);
+    while(true) {
+        Wait(1000);
+    }
+}
+
+
 #endif
