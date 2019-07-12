@@ -21,7 +21,7 @@ void notifyError();
 inline void Say (std::string text, int speed, int pitch) {
     int res = generateAudioFile(text, speed, pitch);
     if (res != 0) {
-        notifyError();
+        NEPOError("NEPO-TTS not found!", "Please copy the folder into the SD card");
     } else {
         PlayFileEx((char *) GENERATED_AUDIO_FILE, GetVolume(), false);
     }
@@ -59,16 +59,6 @@ inline int generateAudioFile (std::string text, int speed, int pitch)  {
         } while (exitedChild != childPid);
         return WIFEXITED(exitStatus) && WEXITSTATUS(exitStatus);
     }
-}
-
-
-void notifyError () {
-    DrawString("ERROR", 8, 2);
-    DrawString("NEPO-TTS not found!", 2, 4);
-    DrawString("Please copy the folder into the SD card", 0, 8);
-    DrawString("CENTER + DOWN to exit", 1, 11);
-    PlaySystemSound(SOUND_LOW_BEEP);
-    while(true);
 }
 
 #endif
