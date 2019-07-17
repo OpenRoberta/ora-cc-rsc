@@ -1,7 +1,7 @@
 #ifndef NEPOCOLORS
 #define NEPOCOLORS
 
-enum Color { Transparent, Black, Blue, Green, Yellow, Red, White, Brown, Orange, Lime, Violet, Crimson, Purple, Grey };
+enum Color { None, Black, Blue, Green, Yellow, Red, White, Brown, Orange, Lime, Violet, Crimson, Purple, Grey };
 
 /* Colors not already defined in c4ev3 library */
 #ifndef INPUT_BROWNCOLOR
@@ -30,8 +30,8 @@ enum Color { Transparent, Black, Blue, Green, Yellow, Red, White, Brown, Orange,
 
 std::string GetColorName (Color color) {
 	switch(color) {
-	    case Transparent:
-	        return "Transparent";
+	    case None:
+	        return "None";
 	    case Black:
 	      return "Black";
 	    case Blue:
@@ -65,7 +65,7 @@ std::string GetColorName (Color color) {
 Color GetColorFromC4ev4Int (int c4ev3Color) {
     switch(c4ev3Color) {
 	    case 0:
-	        return Transparent;
+	        return None;
 	    case 1:
 	      return Black;
 	    case 2:
