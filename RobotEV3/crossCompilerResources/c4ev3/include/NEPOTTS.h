@@ -27,16 +27,21 @@ inline void Say (std::string text, int speed, int pitch) {
     }
 }
 
+std::string mapSpeedToEspeakParameter(int speed);
+std::string mapPitchToEspeakParameter(int pitch);
+
 inline int generateAudioFile (std::string text, int speed, int pitch)  {
+    std::string voice = language + "+f1";
     int childPid = fork();
     if (childPid == 0) {
         char * environment[] = { LD_LIBRARY_PATH, (char *) 0 };
         execle(
             ESPEAK_BIN,
             ESPEAK_BIN,
-            "-v", language.c_str(),
-            "-s", ToString(speed).c_str(),
-            "-p", ToString(pitch).c_str(),
+            "-v", voice.c_str(),
+            "-a", "200",
+            "-s", mapSpeedToEspeakParameter(speed).c_str(),
+            "-p", mapPitchToEspeakParameter(pitch).c_str(),
             "-w", GENERATED_AUDIO_FILE,
             text.c_str(),
             (char *) NULL,
@@ -51,6 +56,18 @@ inline int generateAudioFile (std::string text, int speed, int pitch)  {
         } while (exitedChild != childPid);
         return WIFEXITED(exitStatus) && WEXITSTATUS(exitStatus);
     }
+}
+
+std::string mapSpeedToEspeakParameter(int speed) {
+    speed = std::max(0, std::min(speed, 100));
+    speed = (((double)speed) * 2.5) + 100;
+    return std::to_string(speed);
+}
+
+std::string mapPitchToEspeakParameter(int pitch) {
+    pitch = std::max(0, std::min(pitch, 100));
+    pitch = ((double)pitch) * 0.99;
+    return std::to_string(pitch);
 }
 
 #endif
