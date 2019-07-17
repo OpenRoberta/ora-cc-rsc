@@ -29,12 +29,11 @@ inline int ReadSensorInMode (int port, int mode) {
 inline std::list<double> ReadColorSensorRGB (int port) {
     int rgb = ReadSensorInMode(port, COL_RGB);
     std::list<double> values;
-    _setListElementByIndex(values, 0, GetRFromRGB(rgb) / 255.0);
-    _setListElementByIndex(values, 1, GetGFromRGB(rgb) / 255.0);
-    _setListElementByIndex(values, 2, GetBFromRGB(rgb) / 255.0);
+    _setListElementByIndex(values, 0, GetRFromRGB(rgb));
+    _setListElementByIndex(values, 1, GetGFromRGB(rgb));
+    _setListElementByIndex(values, 2, GetBFromRGB(rgb));
     return values;
 }
-
 
 inline Color ReadColorSensor (int port) {
     int c4ev3 = ReadSensorInMode(port, COL_COLOR);

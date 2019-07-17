@@ -27,14 +27,6 @@ inline void Say (std::string text, int speed, int pitch) {
     }
 }
 
-
-inline void Say (std::list<std::string> strings, int speed, int pitch) {
-    for (auto str : strings) {
-        Say(str, speed, pitch);
-    }
-}
-
-
 inline int generateAudioFile (std::string text, int speed, int pitch)  {
     int childPid = fork();
     if (childPid == 0) {
