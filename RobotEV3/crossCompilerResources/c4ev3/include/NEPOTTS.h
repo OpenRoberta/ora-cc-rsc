@@ -34,7 +34,7 @@ inline int generateAudioFile (std::string text, int speed, int pitch)  {
     std::string voice = language + "+f1";
     int childPid = fork();
     if (childPid == 0) {
-        char * environment[] = { LD_LIBRARY_PATH, (char *) 0 };
+        char * environment[] = { (char *) LD_LIBRARY_PATH, NULL };
         execle(
             ESPEAK_BIN,
             ESPEAK_BIN,

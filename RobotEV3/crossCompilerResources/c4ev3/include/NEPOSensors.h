@@ -47,9 +47,14 @@ inline std::list<double> _ReadIRSeekAllChannels (int port) {
     int * values = ReadIRSeekAllChannels(port);
     for (int i = 0; i < IR_CHANNELS; i++) {
         int measurement = values[i * 2];
-        int raw = values[(i * 2) + 1];
-        _setListElementByIndex(valuesInList, i * 2, measurement == -1 ? HUGE_VAL : measurement);
-        _setListElementByIndex(valuesInList, (i * 2) + 1, raw);
+        int distance = values[(i * 2) + 1];
+        if (distance == 128) { // no beacon for this channel
+            valuesInList.push_back(0);
+            valuesInList.push_back(HUGE_VAL);
+        } else {
+            valuesInList.push_back(measurement);
+            valuesInList.push_back(distance);
+        }
     }
     return valuesInList;
 }
