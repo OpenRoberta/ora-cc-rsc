@@ -1,7 +1,6 @@
 #ifndef NEPOSENSORS
 #define NEPOSENSORS
 
-#include "ev3_timer.h"
 #include "NEPOLists.h"
 
 #define DEFAULT_MODE_COLOR      COL_COLOR
@@ -15,51 +14,33 @@
 
 #define TIMERS_COUNT 5
 
-inline void switchToMode(int port, int mode) {
-    if (GetSensorName(port) != mode) {
-        SetSensorMode(port, mode);
-    }
-}
 
-inline int ReadSensorInMode (int port, int mode) {
-    switchToMode(port, mode);
-    return readSensor(port);
-}
-
-inline std::list<double> ReadColorSensorRGB (int port) {
-    int rgb = ReadSensorInMode(port, COL_RGB);
+inline std::list<double> NEPOReadEV3ColorSensorRGB (int port) {
+    RGB rgb = ReadEV3ColorSensorRGB(port);
     std::list<double> values;
-    _setListElementByIndex(values, 0, GetRFromRGB(rgb));
-    _setListElementByIndex(values, 1, GetGFromRGB(rgb));
-    _setListElementByIndex(values, 2, GetBFromRGB(rgb));
+    _setListElementByIndex(values, 0, rgb.red);
+    _setListElementByIndex(values, 1, rgb.green);
+    _setListElementByIndex(values, 2, rgb.blue);
     return values;
-}
-
-inline Color ReadColorSensor (int port) {
-    int c4ev3 = ReadSensorInMode(port, COL_COLOR);
-    return GetColorFromC4ev4Int(c4ev3);
 }
 
 
 inline std::list<double> _ReadIRSeekAllChannels (int port) {
-    switchToMode(port, IR_SEEK);
+    EV3IrSeekResult res = ReadEV3IrSensorSeek(port);
     std::list<double> valuesInList;
-    int * values = ReadIRSeekAllChannels(port);
-    for (int i = 0; i < IR_CHANNELS; i++) {
-        int measurement = values[i * 2];
-        int distance = values[(i * 2) + 1];
+    for (int i = 0; i < EV3_IR_CHANNELS; i++) {
+        int direction = res.directions[i];
+        int distance = res.distances[i];
         if (distance == 128) { // no beacon for this channel
             valuesInList.push_back(0);
             valuesInList.push_back(HUGE_VAL);
         } else {
-            valuesInList.push_back(measurement);
+            valuesInList.push_back(direction);
             valuesInList.push_back(distance);
         }
     }
     return valuesInList;
 }
-
-
 
 unsigned long long NEPOTimers[TIMERS_COUNT];
 

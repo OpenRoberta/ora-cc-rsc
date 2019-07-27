@@ -1,6 +1,9 @@
 #ifndef NEPOBLUETOOTH
 #define NEPOBLUETOOTH
 
+
+#define BLUETOOTH_STRING_MESSAGE_MAX_LENGTH 128
+
 void NotifyBluetoothNameNotFoundError();
 
 BluetoothConnectionHandle NEPOConnectTo(std::string name) {

@@ -45,12 +45,12 @@ extern "C" {
 #include "ev3_constants.h"
 
 typedef enum {
-	ti10ms,
-	ti50ms,
-	ti100ms,
-	ti250ms,
-	ti500ms,
-	ti1sec
+    ti10ms,
+    ti50ms,
+    ti100ms,
+    ti250ms,
+    ti500ms,
+    ti1sec
 } TimerInterval;
 
 typedef void (*TimerCallback)(int sig);

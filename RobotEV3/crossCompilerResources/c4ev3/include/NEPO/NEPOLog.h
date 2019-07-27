@@ -1,0 +1,159 @@
+#ifndef NEPOLOG
+#define NEPOLOG
+
+#define LOG_DELAY 2000
+
+void * loggingLoop (void * arguments);
+
+void startLoggingThread (uint8_t motorPorts) {
+    static uint8_t _motorPorts = 0;
+    _motorPorts = motorPorts;
+    pthread_t threadId;
+    pthread_create(&threadId, NULL, loggingLoop, &_motorPorts);
+}
+
+void logMotors (uint8_t motorPorts);
+void logSensors ();
+
+void * loggingLoop (void * arguments) {
+    uint8_t motorPorts = *((uint8_t *) arguments);
+    while (1) {
+        logMotors(motorPorts);
+        logSensors();
+        Wait(LOG_DELAY);
+    }
+}
+
+bool isMotorPortUsed (uint8_t usedMotorPorts, uint8_t motorPort);
+void logMotor(char portName, uint8_t port);
+
+void logMotors (uint8_t usedMotorPorts) {
+    char motorPortName[] = { 'A', 'B', 'C', 'D' };
+    uint8_t motorPorts[] = { OUT_A, OUT_B, OUT_C, OUT_D };
+    for (int i = 0; i < NUM_OUTPUTS; i++) {
+        uint8_t port = motorPorts[i];
+        if (isMotorPortUsed(usedMotorPorts, port)) {
+            logMotor(motorPortName[i], port);
+        }
+    }
+}
+
+bool isMotorPortUsed (uint8_t usedMotorPorts, uint8_t motorPort) {
+    return usedMotorPorts & motorPort;
+}
+
+void logMotor(char portName, uint8_t port) {
+    int tachoCount;
+    OutputGetTachoCount(port, &tachoCount);
+    TermPrintf("%c: %d", portName, tachoCount);
+}
+
+void logSensor (int port);
+
+void logSensors () {
+    for (int i = 0; i < NUM_INPUTS; i++) {
+        logSensor(i);
+    }
+}
+
+std::string readSensorAsString (int port, SensorHandler * sensor);
+
+void logSensor (int port) {
+    SensorHandler * sensor = GetSensor(port);
+    if (sensor  == NULL) {
+        return;
+    }
+
+    std::string value = readSensorAsString(port, sensor);
+    TermPrintf("%d: %s", port + 1, value.c_str());
+}
+
+std::string readEV3TouchSensorAsString (int port) {
+    return ToString(ReadEV3TouchSensor(port));
+}
+
+std::string readEV3GyroSensorAsString (int port) {
+    return "angle: " + ToString(ReadEV3GyroSensor(port, EV3GyroAngle)) +
+        " rate: " + ToString(ReadEV3GyroSensor(port, EV3GyroRate));
+}
+
+std::string readEV3ColorSensorAsString (int port) {
+    int mode = EV3Color->currentSensorMode[port];
+    switch (mode) {
+        case EV3_COLOR_SENSOR_REFLECT_MODE:
+            return ToString(ReadEV3ColorSensorLight(port, ReflectedLight));
+        case EV3_COLOR_SENSOR_AMBIENT_MODE:
+            return ToString(ReadEV3ColorSensorLight(port, AmbientLight));
+        case EV3_COLOR_SENSOR_COLOR_MODE:
+            return ToString(ReadEV3ColorSensor(port));
+        case EV3_COLOR_SENSOR_RGB_MODE:
+            return ToString(NEPOReadEV3ColorSensorRGB(port));
+        default:
+            return "???";   
+    }
+}
+
+std::string readEV3IrSensorAsString (int port) {
+    int mode = EV3Ir->currentSensorMode[port];
+    switch (mode) {
+        case EV3_IR_SENSOR_PROXIMITY_MODE:
+            return ToString(ReadEV3IrSensorProximity(port)); 
+        case EV3_IR_SENSOR_SEEK_MODE:
+            return ToString(_ReadIRSeekAllChannels(port));
+        default:
+            return "???";   
+    }
+}
+
+
+std::string readEV3UltrasonicSensorAsString (int port) {
+    int mode = EV3Ultrasonic->currentSensorMode[port];
+    switch (mode) {
+        case EV3_ULTRASONIC_SENSOR_DISTANCE_MM_MODE:
+            return ToString(ReadEV3UltrasonicSensorDistance(port, CM));
+        case EV3_ULTRASONIC_SENSOR_LISTEN_MODE:
+            return ToString(ReadEV3UltrasonicSensorListen(port));
+        default:
+            return "???";   
+    }
+}
+
+
+std::string readHTCompassSensorAsString (int port) {
+    return "angle: " + ToString(ReadHTCompassSensor(port, HTCompassAngle)) + 
+        " comp: " + ToString(ReadHTCompassSensor(port, HTCompassCompass));
+}
+
+std::string readHTIrSensorAsString (int port) {
+    int mode = HTIr->currentSensorMode[port];
+    return ToString(ReadHTIrSensor(port, (HTIrSensorMode) mode));
+}
+
+std::string readNXTSoundSensorAsString (int port) {
+    return ToString(ReadNXTSoundSensor(port, DB));
+}
+
+std::string readSensorAsString (int port, SensorHandler * sensor) {
+    if (sensor == EV3Touch) {
+        return readEV3TouchSensorAsString(port);
+    } else if (sensor == EV3Gyro) {
+        return readEV3GyroSensorAsString(port);
+    } else if (sensor == EV3Color) {
+        return readEV3ColorSensorAsString(port);
+    } else if (sensor == EV3Ir) {
+        return readEV3IrSensorAsString(port);
+    } else if (sensor == EV3Ultrasonic) {
+        return readEV3UltrasonicSensorAsString(port);
+    } else if (sensor == HTCompass) {
+        return readHTCompassSensorAsString(port);
+    } else if (sensor == HTIr) {
+        return readHTIrSensorAsString(port);
+    } else if (sensor == NXTSound) {
+        return readNXTSoundSensorAsString(port);
+    }
+
+    return "Not implemented";
+}
+
+
+#endif

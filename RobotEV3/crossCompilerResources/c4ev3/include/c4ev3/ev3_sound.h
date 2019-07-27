@@ -45,7 +45,7 @@ extern "C" {
 #include <limits.h>
 #include <errno.h>
 
-#include "ev3_command.h"
+#include "ev3_wait.h"
 #include "ev3_constants.h"
 
 typedef struct
@@ -68,7 +68,7 @@ void PlayToneEx(unsigned short frequency, unsigned short duration, uint8_t volum
 
 #define PlayTone(_f, _d) PlayToneEx((_f), (_d), 100)
 
-void PlaySoundEx(uint8_t aCode, int volume);
+void PlaySoundEx(uint8_t aCode, uint8_t volume);
 
 /**
  * Play a system sound.

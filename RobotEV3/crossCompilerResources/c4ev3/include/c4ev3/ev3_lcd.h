@@ -236,9 +236,9 @@ char EllipseOutEx(int x, int y, uint8_t radiusX, uint8_t radiusY, unsigned long 
 bool LcdTextf(char Color, short X, short Y, const char *fmt, ...);
 
 
-int LcdPrintf(char __color, const char * __fmt, ...);
+int LcdPrintf(char color, const char * fmt, ...);
 
-int LcdPrintln(char __color, const char * __fmt, ...);
+int LcdPrintln(char color, const char * fmt, ...);
 
 
 #ifdef __ASPRINTF
@@ -273,7 +273,16 @@ int TermPrintf(const char *fmt, ...);
  */
 int TermPrintln(const char *fmt, ...);
 
+/**
+ * Set cursor position for TermPrint*, LcdPrint* and Ev3Print*
+ * @param x
+ */
 void SetCursorX(short x);
+
+/**
+ * Set cursor position for TermPrint*, LcdPrint* and Ev3Print*
+ * @param y
+ */
 void SetCursorY(short y);
 
 #endif // ev3_lcd_h

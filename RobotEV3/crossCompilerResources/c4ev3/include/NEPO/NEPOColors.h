@@ -1,8 +1,6 @@
 #ifndef NEPOCOLORS
 #define NEPOCOLORS
 
-enum Color { None, Black, Blue, Green, Yellow, Red, White, Brown, Orange, Lime, Violet, Crimson, Purple, Grey };
-
 /* Colors not already defined in c4ev3 library */
 #ifndef INPUT_BROWNCOLOR
 #define INPUT_BROWNCOLOR 7
