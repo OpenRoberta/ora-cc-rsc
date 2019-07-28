@@ -12,6 +12,11 @@ inline int Speed(int speed) {
  * This function will run the motor in reverse if the angle is negative.
 */
 inline void RotateMotorForAngleWithTurn(int outputs, float speed, float angle, float turn) {
+    // If the rotate block is placed right after a motor block, the rotation won't be executed,
+    // since the wheels are already spinning and the encoder values change
+    Off(outputs);
+    Wait(100);
+
     if (angle < 0) {
         speed *= -1;
         angle *= -1;

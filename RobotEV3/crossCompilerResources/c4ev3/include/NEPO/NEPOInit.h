@@ -23,7 +23,7 @@ void inline NEPOInitEV3 () {
     InitEV3();
     if (NEPOProgramJustUploaded()) {
         onNEPOProgramJustUploaded();
-    }
+    }        
     startThreadToMonitorEscapeSequence();
     SetLedPattern(LED_GREEN_PULSE);
 }

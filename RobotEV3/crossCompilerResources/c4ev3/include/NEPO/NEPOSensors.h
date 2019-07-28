@@ -14,6 +14,18 @@
 
 #define TIMERS_COUNT 5
 
+inline void NEPOSetAllSensors(SensorHandler * port1, SensorHandler * port2, SensorHandler * port3, SensorHandler * port4){
+    DrawString("Initializing sensors", 1, 3);
+    SetAllSensors(port1, port2, port3, port4);
+    LcdClean();
+}
+
+inline void NEPOResetEV3GyroSensor(int port) {
+    LcdClean();
+    DrawString("Resetting Gyro " + ToString(port + 1), 3, 3);
+    ResetEV3GyroSensor(port);
+    LcdClean();
+}
 
 inline std::list<double> NEPOReadEV3ColorSensorRGB (int port) {
     RGB rgb = ReadEV3ColorSensorRGB(port);
