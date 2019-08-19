@@ -64,7 +64,7 @@ void moveProgramToFolder() {
     std::string installerfolder = INSTALLER_FOLDER;
     std::string programFolder = projectsFolder + "/" + programName;
 
-    systemString("mkdir " + programFolder);
+    systemString("mkdir -p " + programFolder);
     systemString("mv " + installerfolder + "/" + programName + ".elf " + programFolder + "/" + programName + ".elf");
     systemString("mv " + installerfolder + "/" + programName + ".tmp " + programFolder + "/" + programName + ".rbf");
     systemString("rm " + installerfolder + "/" + programName + ".rbf");
