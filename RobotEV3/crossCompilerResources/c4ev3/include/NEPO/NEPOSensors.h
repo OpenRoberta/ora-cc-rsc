@@ -36,7 +36,6 @@ inline std::list<double> NEPOReadEV3ColorSensorRGB (int port) {
     return values;
 }
 
-
 inline std::list<double> _ReadIRSeekAllChannels (int port) {
     EV3IrSeekResult res = ReadEV3IrSensorSeek(port);
     std::list<double> valuesInList;
@@ -54,8 +53,18 @@ inline std::list<double> _ReadIRSeekAllChannels (int port) {
     return valuesInList;
 }
 
-unsigned long long NEPOTimers[TIMERS_COUNT];
+inline std::list<double> NEPOReadHTColorSensorV2RGBA (int port, HTColorV2ReadingMode mode) {
+    RGBA rgba = ReadHTColorSensorV2RGBA(port, mode);
+    std::list<double> values;
+    _setListElementByIndex(values, 0, rgba.red);
+    _setListElementByIndex(values, 1, rgba.green);
+    _setListElementByIndex(values, 2, rgba.blue);
+    _setListElementByIndex(values, 3, rgba.white);
+    return values;
+}
 
+
+unsigned long long NEPOTimers[TIMERS_COUNT];
 
 inline void ResetTimer (int stopwatch) {
     NEPOTimers[stopwatch] = TimerGetMS();

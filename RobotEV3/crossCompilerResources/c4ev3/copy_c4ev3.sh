@@ -55,7 +55,7 @@ function copy_static_library {
 	safe_cp "$C4EV3_PATH/libev3api.a" "$SCRIPTPATH/$LIB_FOLDER/libev3api.a"
 }
 
-#clear
+clear
 copy_headers
 printf "headers copied\n\n"
 

@@ -30,7 +30,6 @@
 #include <stdbool.h>
 #include "../copied/lms2012/ev3_basictypes.h"
 
-
 /**
  * Select channel for the Beacon control
  * Note: Can be changed while running

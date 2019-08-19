@@ -3,22 +3,23 @@
 
 #include "ev3_sensors.h"
 
+#define HT_IR_SENSOR_DEFAULT_MODE 0
+
+// TODO: Specify version 2
 extern SensorHandler * HTIr;
 
-typedef enum HTIrSensorMode {
+typedef enum HTIrReadingMode {
     Modulated,
     Unmodulated
-} HTIrSensorMode;
+} HTIrReadingMode;
 
 bool initHTIrSensor(int port);
 
-int ReadHTIrSensor(int port, HTIrSensorMode mode);
+int ReadHTIrSensor(int port, HTIrReadingMode mode);
 
 void exitHTIrSensor(int port);
 
 /* Utility functions */
-void writeIicRequestToHTIrToReadRegister(int sensorPort, int registerAddress);
-void switchHTIrSensorModeIfNeeded(int port, HTIrSensorMode mode);
-void switchHTIrSensorMode(int port, HTIrSensorMode mode);
+int getHTIrRegisterForReadingMode(HTIrReadingMode mode);
 
 #endif //EV3_API_HT_IR_H
