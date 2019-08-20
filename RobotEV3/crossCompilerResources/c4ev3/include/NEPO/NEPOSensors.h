@@ -53,8 +53,13 @@ inline std::list<double> _ReadIRSeekAllChannels (int port) {
     return valuesInList;
 }
 
-inline std::list<double> NEPOReadHTColorSensorV2RGBA (int port, HTColorV2ReadingMode mode) {
-    RGBA rgba = ReadHTColorSensorV2RGBA(port, mode);
+inline Color NEPOReadHTColorSensorV2 (int port) {
+    int colorId = ReadHTColorSensorV2(port);
+    return mapHTColorIdToColor(colorId);
+}
+
+inline std::list<double> NEPOReadHTColorSensorV2RGBA (int port) {
+    RGBA rgba = ReadHTColorSensorV2RGBA(port, HTColorSensorDefaultMode);
     std::list<double> values;
     _setListElementByIndex(values, 0, rgba.red);
     _setListElementByIndex(values, 1, rgba.green);
@@ -63,6 +68,10 @@ inline std::list<double> NEPOReadHTColorSensorV2RGBA (int port, HTColorV2Reading
     return values;
 }
 
+inline float NEPOReadHTColorSensorV2Light (int port, EV3ColorLightReadingMode mode) {
+    RGBA rgba = ReadHTColorSensorV2RGBA(port, mode == ReflectedLight ? HTColorSensorDefaultMode : HTColorSensorPassiveMode);
+    return rgba.white;
+}
 
 unsigned long long NEPOTimers[TIMERS_COUNT];
 

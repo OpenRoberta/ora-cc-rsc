@@ -99,4 +99,38 @@ Color GetColorFromC4ev4Int (int c4ev3Color) {
   }
 }
 
+Color mapHTColorIdToColor(int colorId) {
+	switch(colorId) {
+		case 0:
+            return Black;
+        case 1:
+        case 2:
+            return Red;
+        case 3:
+            return Blue;
+        case 4:
+            return Green;
+        case 5:
+        case 6:
+        case 7:
+            return Yellow;
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+            return Red;
+        case 12:
+        case 13:
+            return Yellow;
+        case 14:
+        case 15:
+        case 16:
+            return Red;
+        case 17:
+            return White;
+        default:
+            return None;
+	}
+}
+
 #endif

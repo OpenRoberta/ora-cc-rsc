@@ -138,11 +138,9 @@ std::string readHTColorSensorV2AsString (int port) {
     switch (mode) {
         case HT_COLOR_SENSOR_V2_DEFAULT_MODE:
             return "color id: " + ToString(ReadHTColorSensorV2(port)) +
-                " rgba: " + ToString(NEPOReadHTColorSensorV2RGBA(port, HTColorSensorDefaultMode));
+                " rgba: " + ToString(NEPOReadHTColorSensorV2RGBA(port));
         case HT_COLOR_SENSOR_V2_PASSIVE_MODE:
-            return ToString(NEPOReadHTColorSensorV2RGBA(port, HTColorSensorPassiveMode));
-        case HT_COLOR_SENSOR_V2_RAW_MODE:
-            return ToString(NEPOReadHTColorSensorV2RGBA(port, HTColorSensorRawMode));
+            return "ambient light: " + ToString(NEPOReadHTColorSensorV2Light(port, AmbientLight));
         default:
             return "???";   
     }
