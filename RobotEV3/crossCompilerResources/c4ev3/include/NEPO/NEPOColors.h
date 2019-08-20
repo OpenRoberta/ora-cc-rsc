@@ -24,32 +24,29 @@ std::string GetColorName (Color color) {
 }
 
 Color mapHTColorIdToColor(int colorId) {
-	switch(colorId) {
+    switch(colorId) {
 		case 0:
             return Black;
         case 1:
         case 2:
-            return Red;
         case 3:
             return Blue;
         case 4:
             return Green;
         case 5:
         case 6:
-        case 7:
             return Yellow;
+        case 7:
+            return Red;
         case 8:
         case 9:
         case 10:
         case 11:
-            return Red;
         case 12:
         case 13:
-            return Yellow;
         case 14:
         case 15:
         case 16:
-            return Red;
         case 17:
             return White;
         default:
