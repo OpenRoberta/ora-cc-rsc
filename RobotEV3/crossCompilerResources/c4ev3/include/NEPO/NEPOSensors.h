@@ -79,7 +79,7 @@ inline double NEPOReadHTColorSensorV2Light (int port) {
 inline double NEPOReadHTColorSensorV2AmbientLight (int port) {
     RGBA rgba = ReadHTColorSensorV2RGBA(port, HTColorSensorPassiveMode);
     double light = (rgba.white * 100.0) / 38200.0;
-    return std::max(light, 100.0);
+    return std::min(light, 100.0);
 }
 
 
