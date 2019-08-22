@@ -32,15 +32,15 @@ Color mapHTColorIdToColor(int colorId) {
         case 3:
             return Blue;
         case 4:
-            return Green;
         case 5:
+            return Green;
         case 6:
             return Yellow;
         case 7:
-            return Red;
         case 8:
         case 9:
         case 10:
+            return Red;
         case 11:
         case 12:
         case 13:
