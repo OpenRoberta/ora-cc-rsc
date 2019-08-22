@@ -31,12 +31,16 @@ inline double colorComponentValueToPercentage (double value) {
     return ((value * 100.0) / 1023.0);
 }
 
+inline double colorComponentValueTo255 (double value) {
+    return ((value * 255.0) / 1023.0);
+}
+
 inline std::list<double> NEPOReadEV3ColorSensorRGB (int port) {
     RGB rgb = ReadEV3ColorSensorRGB(port);
     std::list<double> values;
-    _setListElementByIndex(values, 0, colorComponentValueToPercentage(rgb.red));
-    _setListElementByIndex(values, 1, colorComponentValueToPercentage(rgb.green));
-    _setListElementByIndex(values, 2, colorComponentValueToPercentage(rgb.blue));
+    _setListElementByIndex(values, 0, colorComponentValueTo255(rgb.red));
+    _setListElementByIndex(values, 1, colorComponentValueTo255(rgb.green));
+    _setListElementByIndex(values, 2, colorComponentValueTo255(rgb.blue));
     return values;
 }
 
@@ -66,9 +70,9 @@ inline Color NEPOReadHTColorSensorV2 (int port) {
 inline std::list<double> NEPOReadHTColorSensorV2RGB (int port) {
     RGBA rgba = ReadHTColorSensorV2RGBA(port, HTColorSensorDefaultMode);
     std::list<double> values;
-    _setListElementByIndex(values, 0, colorComponentValueToPercentage(rgba.red));
-    _setListElementByIndex(values, 1, colorComponentValueToPercentage(rgba.green));
-    _setListElementByIndex(values, 2, colorComponentValueToPercentage(rgba.blue));
+    _setListElementByIndex(values, 0, colorComponentValueTo255(rgba.red));
+    _setListElementByIndex(values, 1, colorComponentValueTo255(rgba.green));
+    _setListElementByIndex(values, 2, colorComponentValueTo255(rgba.blue));
     return values;
 }
 
