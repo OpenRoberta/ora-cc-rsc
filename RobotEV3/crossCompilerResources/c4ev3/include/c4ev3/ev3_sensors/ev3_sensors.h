@@ -7,8 +7,13 @@
 
 #define NONE_MODE -1
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct SensorHandler {
     bool (*Init)(int port);
+
     void (*Exit)(int port);
 
     /**
@@ -39,14 +44,18 @@ typedef struct SensorHandler {
 #include "pixy_cam.h"
 
 
-bool SensorInit ();
+bool SensorInit();
 
-bool SetSensor (int port, SensorHandler * sensor);
+bool SetSensor(int port, SensorHandler *sensor);
 
-SensorHandler * GetSensor (int port);
+SensorHandler *GetSensor(int port);
 
-bool SetAllSensors (SensorHandler * port1, SensorHandler * port2, SensorHandler * port3, SensorHandler * port4);
+bool SetAllSensors(SensorHandler *port1, SensorHandler *port2, SensorHandler *port3, SensorHandler *port4);
 
-void SensorExit ();
+void SensorExit();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //EV3_API_EV3_SENSORS_H

@@ -17,7 +17,7 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
 function clear {
 	rm -rf "$SCRIPTPATH/include/c4ev3"
-	mkdir -p "$SCRIPTPATH/include/c4ev3" "$SCRIPTPATH/include/c4ev3/ev3_sensors" "$SCRIPTPATH/include/c4ev3/ev3_inputs"
+	mkdir -p "$SCRIPTPATH/include/c4ev3" "$SCRIPTPATH/include/c4ev3/ev3_sensors"
 }
 
 function safe_cp {
@@ -32,7 +32,6 @@ function safe_cp {
 function copy_headers {
 	safe_cp $C4EV3_PATH/src/*.h "$SCRIPTPATH/include/c4ev3"
 	safe_cp $C4EV3_PATH/src/ev3_sensors/*.h "$SCRIPTPATH/include/c4ev3/ev3_sensors"
-	safe_cp $C4EV3_PATH/src/ev3_inputs/*.h "$SCRIPTPATH/include/c4ev3/ev3_inputs"
 }
 
 function build_static_library {

@@ -34,14 +34,18 @@ typedef enum EV3ColorLightReadingMode {
 
 bool initEV3ColorSensor(int port);
 
+/**
+ * @param port
+ * @param mode
+ * @return Value from 0 to 100
+ */
 int ReadEV3ColorSensorLight(int port, EV3ColorLightReadingMode mode);
 
 Color ReadEV3ColorSensor(int port);
 
 /**
- * Read RGB values. Each value ranges from 0 to 1023
  * @param port
- * @return
+ * @return Each value ranges from 0 to 1023
  */
 RGB ReadEV3ColorSensorRGB(int port);
 

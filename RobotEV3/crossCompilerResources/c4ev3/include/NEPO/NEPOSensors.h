@@ -40,6 +40,7 @@ inline std::list<double> NEPOReadEV3ColorSensorRGB (int port) {
     return values;
 }
 
+// TODO: Rename with NEPO prefix to follow convention
 inline std::list<double> _ReadIRSeekAllChannels (int port) {
     EV3IrSeekResult res = ReadEV3IrSensorSeek(port);
     std::list<double> valuesInList;

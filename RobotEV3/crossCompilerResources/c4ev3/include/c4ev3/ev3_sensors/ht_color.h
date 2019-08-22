@@ -29,10 +29,15 @@ typedef struct RGBA {
 
 bool initHTColorSensorV2(int port);
 
+/**
+ * @param port
+ * @return HiTechnic color id (from 0 top 17, mapping on HiTechnic website)
+ */
 int ReadHTColorSensorV2(int port);
 
 /**
- * Read RGBA values. Each value ranges from 0 to 1023
+ * With default reading mode (HTColorSensorDefaultMode) the values range from 0 to 1023.
+ * With passive (HTColorSensorPassiveMode) and raw (HTColorSensorRawMode), the values range from 0 to 65535.
  * @param port
  * @return
  */
