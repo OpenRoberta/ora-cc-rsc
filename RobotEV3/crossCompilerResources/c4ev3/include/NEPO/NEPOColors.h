@@ -28,12 +28,13 @@ Color mapHTColorIdToColor(int colorId) {
 		case 0:
             return Black;
         case 1:
+            return Red;
         case 2:
         case 3:
             return Blue;
         case 4:
-        case 5:
             return Green;
+        case 5:
         case 6:
             return Yellow;
         case 7:
