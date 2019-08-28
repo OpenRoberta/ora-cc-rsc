@@ -34,7 +34,7 @@ from lib import token_assembler
 from lib import hl_parser
 
 # To disable the log output, put use=False as the only parameter
-LOG = util.SimpleLog(use=True)
+LOG = util.SimpleLog(use=False)
 
 INT_ERROR_RE = re.compile("internal error")
 
@@ -157,7 +157,7 @@ def ProcessCommandArgs(args):
                         choices=list(zip(*outputChoices))[0],
                         help="Output location (default:%(default)s)")
     parser.add_argument("-l", type=util.LowerStr,
-                        choices=list(zip(*levelChoices))[0], default="debug",  # default="debug",
+                        choices=list(zip(*levelChoices))[0], default="error",  # default="debug",
                         help="Output level (default:%(default)s). " +
                         "\nAll output from previous levels and this one will be generated")
 
@@ -165,7 +165,7 @@ def ProcessCommandArgs(args):
                         choices=testChoices, help="Special tests. " +
                         "INSTEAD of doing normal processing, do the special test")
 
-    print("Args:",  args)
+    #print("Args:",  args)
     parsed = parser.parse_args(args)
 
     sinkNumber = [x[1] for x in outputChoices if x[0] == parsed.o][0]
