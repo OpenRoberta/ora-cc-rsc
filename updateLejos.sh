@@ -18,21 +18,21 @@ fi
 
 lejosIpAddr='10.0.1.1'
 
-run="scp -oKexAlgorithms=+diffie-hellman-group1-sha1 RobotEV3/updateResources/lejos_${lejosVersion}/EV3Menu.jar root@${lejosIpAddr}:/home/root/lejos/bin/utils"
+run="scp -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes256-cbc RobotEV3/updateResources/lejos_${lejosVersion}/EV3Menu.jar root@${lejosIpAddr}:/home/root/lejos/bin/utils"
 echo "executing: ${run}"
 $run
 
-run="echo ${serverUrl} | ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 root@${lejosIpAddr} \"cat > /home/roberta/serverIP.txt\""
+run="echo ${serverUrl} | ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes256-cbc root@${lejosIpAddr} \"cat > /home/roberta/serverIP.txt\""
 echo "executing: ${run}"
 $run
 
-run="ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 root@${lejosIpAddr} mkdir -p /home/roberta/lib"
+run="ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes256-cbc root@${lejosIpAddr} mkdir -p /home/roberta/lib"
 echo "executing: ${run}"
 $run
 
 runtime="RobotEV3/updateResources/lejos_${lejosVersion}/EV3Runtime.jar"
 json="RobotEV3/updateResources/lejos_${lejosVersion}/json.jar"
 websocket="RobotEV3/updateResources/lejos_${lejosVersion}/Java-WebSocket.jar"
-run="scp -oKexAlgorithms=+diffie-hellman-group1-sha1 ${runtime} ${json} ${websocket} root@${lejosIpAddr}:/home/roberta/lib"
+run="scp -oKexAlgorithms=+diffie-hellman-group1-sha1 -c aes256-cbc ${runtime} ${json} ${websocket} root@${lejosIpAddr}:/home/roberta/lib"
 echo "executing: ${run}"
 $run

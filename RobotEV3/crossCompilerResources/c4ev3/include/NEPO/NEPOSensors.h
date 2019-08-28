@@ -27,16 +27,24 @@ inline void NEPOResetEV3GyroSensor(int port) {
     LcdClean();
 }
 
+inline double colorComponentValueToPercentage (double value) {
+    return ((value * 100.0) / 1023.0);
+}
+
+inline double colorComponentValueTo255 (double value) {
+    return ((value * 255.0) / 1023.0);
+}
+
 inline std::list<double> NEPOReadEV3ColorSensorRGB (int port) {
     RGB rgb = ReadEV3ColorSensorRGB(port);
     std::list<double> values;
-    _setListElementByIndex(values, 0, rgb.red);
-    _setListElementByIndex(values, 1, rgb.green);
-    _setListElementByIndex(values, 2, rgb.blue);
+    _setListElementByIndex(values, 0, colorComponentValueTo255(rgb.red));
+    _setListElementByIndex(values, 1, colorComponentValueTo255(rgb.green));
+    _setListElementByIndex(values, 2, colorComponentValueTo255(rgb.blue));
     return values;
 }
 
-
+// TODO: Rename with NEPO prefix to follow convention
 inline std::list<double> _ReadIRSeekAllChannels (int port) {
     EV3IrSeekResult res = ReadEV3IrSensorSeek(port);
     std::list<double> valuesInList;
@@ -54,8 +62,33 @@ inline std::list<double> _ReadIRSeekAllChannels (int port) {
     return valuesInList;
 }
 
-unsigned long long NEPOTimers[TIMERS_COUNT];
+inline Color NEPOReadHTColorSensorV2 (int port) {
+    int colorId = ReadHTColorSensorV2(port);
+    return mapHTColorIdToColor(colorId);
+}
 
+inline std::list<double> NEPOReadHTColorSensorV2RGB (int port) {
+    RGBA rgba = ReadHTColorSensorV2RGBA(port, HTColorSensorDefaultMode);
+    std::list<double> values;
+    _setListElementByIndex(values, 0, colorComponentValueTo255(rgba.red));
+    _setListElementByIndex(values, 1, colorComponentValueTo255(rgba.green));
+    _setListElementByIndex(values, 2, colorComponentValueTo255(rgba.blue));
+    return values;
+}
+
+inline double NEPOReadHTColorSensorV2Light (int port) {
+    RGBA rgba = ReadHTColorSensorV2RGBA(port, HTColorSensorDefaultMode);
+    return colorComponentValueToPercentage(rgba.white);
+}
+
+inline double NEPOReadHTColorSensorV2AmbientLight (int port) {
+    RGBA rgba = ReadHTColorSensorV2RGBA(port, HTColorSensorPassiveMode);
+    double light = (rgba.white * 100.0) / 38200.0;
+    return std::min(light, 100.0);
+}
+
+
+unsigned long long NEPOTimers[TIMERS_COUNT];
 
 inline void ResetTimer (int stopwatch) {
     NEPOTimers[stopwatch] = TimerGetMS();

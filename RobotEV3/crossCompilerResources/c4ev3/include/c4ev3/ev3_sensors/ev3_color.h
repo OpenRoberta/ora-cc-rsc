@@ -18,14 +18,7 @@ typedef enum Color {
     Yellow,
     Red,
     White,
-    Brown,
-    Orange,
-    Lime,
-    Violet,
-    Crimson,
-    Purple,
-    Grey,
-    Magenta
+    Brown
 } Color;
 
 typedef struct RGB {
@@ -34,22 +27,32 @@ typedef struct RGB {
     int green;
 } RGB;
 
-typedef enum LightMode {
-    ReflectedLight  = EV3_COLOR_SENSOR_REFLECT_MODE,
-    AmbientLight    = EV3_COLOR_SENSOR_AMBIENT_MODE
-} LightMode;
+typedef enum EV3ColorLightReadingMode {
+    ReflectedLight,
+    AmbientLight
+} EV3ColorLightReadingMode;
 
 bool initEV3ColorSensor(int port);
 
-int ReadEV3ColorSensorLight(int port, LightMode mode);
+/**
+ * @param port
+ * @param mode
+ * @return Value from 0 to 100
+ */
+int ReadEV3ColorSensorLight(int port, EV3ColorLightReadingMode mode);
 
 Color ReadEV3ColorSensor(int port);
 
+/**
+ * @param port
+ * @return Each value ranges from 0 to 1023
+ */
 RGB ReadEV3ColorSensorRGB(int port);
 
 void exitEV3ColorSensor(int port);
 
 /* Utility functions */
+int getEV3ColorSensorModeFromReadingLightMode(EV3ColorLightReadingMode);
 int readEV3ColorSensorRawValue(int port, int mode);
 void setEV3ColorSensorMode(int port, int mode);
 

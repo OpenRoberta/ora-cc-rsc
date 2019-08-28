@@ -126,11 +126,25 @@ std::string readHTCompassSensorAsString (int port) {
 
 std::string readHTIrSensorAsString (int port) {
     int mode = HTIr->currentSensorMode[port];
-    return ToString(ReadHTIrSensor(port, (HTIrSensorMode) mode));
+    return ToString(ReadHTIrSensor(port, (HTIrReadingMode) mode));
 }
 
 std::string readNXTSoundSensorAsString (int port) {
     return ToString(ReadNXTSoundSensor(port, DB));
+}
+
+std::string readHTColorSensorV2AsString (int port) {
+    int mode = HTColorV2->currentSensorMode[port];
+    switch (mode) {
+        case HT_COLOR_SENSOR_V2_DEFAULT_MODE:
+            return "color id: " + ToString(ReadHTColorSensorV2(port)) +
+                " rgb: " + ToString(NEPOReadHTColorSensorV2RGB(port)) +
+                " light: " + ToString(NEPOReadHTColorSensorV2Light(port));
+        case HT_COLOR_SENSOR_V2_PASSIVE_MODE:
+            return "ambient light: " + ToString(NEPOReadHTColorSensorV2AmbientLight(port));
+        default:
+            return "???";   
+    }
 }
 
 std::string readSensorAsString (int port, SensorHandler * sensor) {
@@ -150,6 +164,8 @@ std::string readSensorAsString (int port, SensorHandler * sensor) {
         return readHTIrSensorAsString(port);
     } else if (sensor == NXTSound) {
         return readNXTSoundSensorAsString(port);
+    } else if (sensor == HTColorV2) {
+        return readHTColorSensorV2AsString(port);
     }
 
     return "Not implemented";
