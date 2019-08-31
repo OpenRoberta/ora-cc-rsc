@@ -166,7 +166,10 @@ void analogWrite(uint8_t, int);
 
 unsigned long millis(void);
 unsigned long micros(void);
+
+#ifndef ARDUINO_AVR_BOB3
 void delay(unsigned long);
+#endif
 void delayMicroseconds(unsigned int us);
 unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
 unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);

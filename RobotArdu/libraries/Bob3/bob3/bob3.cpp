@@ -1,23 +1,13 @@
-#ifdef ARDUINO
-#include "bob3/iodefs.h"
-#include "bob3/analog.h"
-#include "bob3/leds.h"
-#include "BOB3.h"
-#include "bob3/utils.h"
-#include "bob3/ircom.h"
-#else
+
 #include "iodefs.h"
 #include "analog.h"
 #include "leds.h"
 #include "bob3.h"
 #include "utils.h"
 #include "ircom.h"
-#endif
-
 #include <stdlib.h>
 #include <avr/io.h>
 #include <avr/boot.h>
-
 
 #ifndef SIGRD
 #define SIGRD 5
@@ -26,20 +16,31 @@
 Bob3 bob3;
 
 uint8_t _bob3_revision;
+extern uint8_t _bob3_edition;
+#define BOB3_EDITION_THT 0
+#define BOB3_EDITION_SMD 1
+
+uint8_t _arm_mode;
 
 void Bob3::init() {
-  uint8_t sig2 = boot_signature_byte_get(4);
-  // if (sig2==0x0a) _bob3_revision = 102;  // V1.02
-  // if (sig2==0x0f) _bob3_revision = 103;  // V1.03
-  _bob3_revision = 103;
+  /*  
+  if (_bob3_edition==BOB3_EDITION_THT)  {
+    uint8_t sig2 = boot_signature_byte_get(4);
+    if (sig2==0x0a) _bob3_revision = 102;  // ATmega88/ATmega88A -> V1.02
+    if (sig2==0x0f) _bob3_revision = 103;  // ATmega88PA -> V1.03
+    
+  } else {
+    _bob3_revision = 103; // like THT V1.03
+  }
+  */
+  _bob3_revision = 103; // always new version!
   leds_init();
   analog_init();
   leds_set_RGBx(1, OFF);
   leds_set_RGBx(2, OFF);
-  // initialize random number generator with physical random seed
-  // delay(50); // wait to generate some analog random bits
-  srand(analog_getRandomSeed());
+  _arm_mode = 1;
 }
+
 
 void Bob3::setLed(uint8_t id, uint16_t color) {
   switch (id) {
@@ -81,111 +82,62 @@ uint16_t Bob3::getIRLight() {
 
 
 void Bob3::enableIRSensor(bool enable) {
-
+  
 }
 
 
 uint8_t Bob3::getArm(uint8_t id) {
-  uint8_t v0, v1, v2, v3;
-  if (id==1) {
-    v0 = analog_getValueExt(ANALOG_L0, 0);
-    v1 = analog_getValueExt(ANALOG_L1, 0);
-    v2 = analog_getValueExt(ANALOG_L2, 0);
-    v3 = analog_getValueExt(ANALOG_L3, 0);
-  } else if (id==2) {
-    v0 = analog_getValueExt(ANALOG_R0, 0);
-    v1 = analog_getValueExt(ANALOG_R1, 0);
-    v2 = analog_getValueExt(ANALOG_R2, 0);
-    v3 = analog_getValueExt(ANALOG_R3, 0);
+  if (_arm_mode==ARMS_DETECTOR) {
+    uint16_t v0;
+    if (id==1) {
+      v0 = analog_getValueExt(ANALOG_L0, 0);
+    } else if (id==2) {
+      v0 = analog_getValueExt(ANALOG_R0, 0);
+    } else {
+      return 0;
+    }
+    // 4095 = maxval
+    // ca. 1100 = untouched
+    // 0 = touched
+    v0 /= 4; // better range...
+
+    // 0: untouched
+    // 255: touched max
+    if (v0>255) return 0;
+    return 255-v0;
+    
   } else {
+    uint8_t v0, v1, v2, v3;
+    if (id==1) {
+      v0 = analog_getValueExt(ANALOG_L0, 0);
+      v1 = analog_getValueExt(ANALOG_L1, 0);
+      v2 = analog_getValueExt(ANALOG_L2, 0);
+      v3 = analog_getValueExt(ANALOG_L3, 0);
+    } else if (id==2) {
+      v0 = analog_getValueExt(ANALOG_R0, 0);
+      v1 = analog_getValueExt(ANALOG_R1, 0);
+      v2 = analog_getValueExt(ANALOG_R2, 0);
+      v3 = analog_getValueExt(ANALOG_R3, 0);
+    } else {
+      return 0;
+    }
+  
+    if (v0&0x01) return 1;
+    if (v1&0x01) return 2;
+    if (v2&0x01) return 2;
+    if (v3&0x01) return 3;
     return 0;
   }
-  if (v0&0x01) return 1;
-  if (v1&0x01) return 2;
-  if (v2&0x01) return 2;
-  if (v3&0x01) return 3;
-  /*
-  v = max(v0, v1, v2, v3);
-  //if (v<175) {
-  if (v>80) {
-    if (v==v0) {
-      return 3;
-    } else if (v==v1) {
-      return 2;
-    } else  if (v==v2) {
-      return 2;
-    } else  if (v==v3) {
-      return 1;
-    }
-  }
-  */
-  return 0;
 }
 
-bool Bob3::getArmPair(uint8_t side, uint8_t section) {
-    uint8_t sensorState = 0;
-    switch (side)
-    {
-    case 2:
-        switch (section)
-        {
-        case 1:
-            sensorState = analog_getValueExt(ANALOG_L3, 0);
-            break;
-        case 2:
-            sensorState = analog_getValueExt(ANALOG_L2, 0);
-            break;
-        case 3:
-            sensorState = analog_getValueExt(ANALOG_L1, 0);
-            break;
-        case 4:
-            sensorState = analog_getValueExt(ANALOG_L0, 0);
-            break;
-        default:
-            return false;
-            break;
-        }
-        break;
-    case 1:
-        switch (section)
-        {
-        case 1:
-            sensorState = analog_getValueExt(ANALOG_R3, 0);
-            break;
-        case 2:
-            sensorState = analog_getValueExt(ANALOG_R2, 0);
-            break;
-        case 3:
-            sensorState = analog_getValueExt(ANALOG_R1, 0);
-            break;
-        case 4:
-            sensorState = analog_getValueExt(ANALOG_R0, 0);
-            break;
-        default:
-            return false;
-            break;
-        }
-        break;
-    default:
-        return false;
-        break;
-    }
-    if (sensorState & 0x01) {
-        return true;
-    }
-    else {
-        return false;
-    }
-}
 
-void Bob3::enableArms(bool enable) {
-
+void Bob3::enableArms(uint8_t enable) {
+  _arm_mode = enable;
 }
 
 
 uint16_t Bob3::getTemperature() {
-  uint16_t centigradeValue = uint16_t( ( analog_getValueExt(ANALOG_TEMP, 0) - 32 ) * ( 5.0 / 9.0 ) );
-  return centigradeValue;
+  return analog_getValueExt(ANALOG_TEMP, 0)/4;
 }
 
 
@@ -219,21 +171,21 @@ uint8_t Bob3::getID() {
   clear_output_bit(IO_ID_1);
   clear_output_bit(IO_ID_2);
   clear_output_bit(IO_ID_3);
-  clear_output_bit(IO_ID_4);
+  clear_output_bit(IO_ID_4);  
   return id;
 }
 
 
-int16_t Bob3::receiveIRCode(uint8_t carrier, uint16_t timeout) {
+int16_t _Bob3_receiveMessage(uint8_t carrier, uint16_t timeout) {
   int16_t code;
   uint8_t an_bak = analog_enable(false);
-  code = ircom_receive(carrier, timeout);
+  code = ircom_receive(carrier, timeout);  
   analog_enable(an_bak);
   return code;
 }
 
 
-void Bob3::transmitIRCode(uint8_t carrier, uint8_t code) {
+void _Bob3_transmitMessage(uint8_t carrier, uint8_t code) {
   uint8_t an_bak = analog_enable(false);
   ircom_transmit(carrier, code);
   analog_enable(an_bak);
@@ -256,27 +208,23 @@ uint16_t mixColor(uint16_t color1, uint16_t color2, uint8_t w1, uint8_t w2) {
   uint8_t r = (((color1>>8)&0x0f)*w1 + ((color2>>8)&0x0f)*w2)/sum;
   uint8_t g = (((color1>>4)&0x0f)*w1 + ((color2>>4)&0x0f)*w2)/sum;
   uint8_t b = (((color1>>0)&0x0f)*w1 + ((color2>>0)&0x0f)*w2)/sum;
-  return rgb(r, g, b);
+  return rgb(r, g, b);  
 }
 
 
 
-uint16_t hsvx(uint8_t h, uint8_t _s, uint8_t _v) {
-  // h: [0..255]
-  // _s: [0..255]
-  // _v: [0..255]
-
+uint16_t hsvx(uint8_t h, uint8_t _s, uint8_t _v) { 
   if (_s == 0) {
     _v >>= 4;
     return rgb(_v,_v,_v);
-  }
-
+  }  
+  
   uint16_t v = _v;
   uint16_t s = _s;
   uint8_t seg, delta;
 
   if      (h>=213) { seg=5; delta = 6*(h-213); }
-  else if (h>=170) { seg=4; delta = 6*(h-170); }
+  else if (h>=170) { seg=4; delta = 6*(h-170); } 
   else if (h>=128) { seg=3; delta = 6*(h-128); }
   else if (h>=85)  { seg=2; delta = 6*(h-85); }
   else if (h>=42)  { seg=1; delta = 6*(h-42); }
@@ -285,9 +233,9 @@ uint16_t hsvx(uint8_t h, uint8_t _s, uint8_t _v) {
   uint8_t p = (v * (255 - s)) >> 12;
   uint8_t q = (v * (255 - ((s * delta) >> 8))) >> 12;
   uint8_t t = (v * (255 - ((s * (255 - delta)) >> 8))) >> 12;
-
+ 
   v >>= 4;
-
+  
   switch (seg) {
     case 0: return rgb(v, t, p);
     case 1: return rgb(q, v, p);
@@ -300,39 +248,39 @@ uint16_t hsvx(uint8_t h, uint8_t _s, uint8_t _v) {
 }
 
 
-uint16_t hsv(int16_t _h, uint8_t _s, uint8_t _v) {
+uint16_t hsv(int16_t _h, uint8_t _s, uint8_t _v) { 
   // _h: [0..359] degree (tolarant)
   // _s: [0..100] percent
   // _v: [0..100] percent
-
+  
   if (_s == 0) {
     _v = 2*_v + _v/2; // Range: [0...250]
     _v >>= 4;
     return rgb(_v,_v,_v);
-  }
-
+  }  
+  
   uint16_t v = 2*_v + _v/2; // Range: [0...250]
   uint16_t s = 2*_s + _s/2; // Range: [0...250]
   uint8_t seg, delta;
 
   while (_h<0) _h += 360;
   while (_h>=360) _h -= 360;
-
+  
   if      (_h>=300) { seg=5; delta = _h-300; }
-  else if (_h>=240) { seg=4; delta = _h-240; }
+  else if (_h>=240) { seg=4; delta = _h-240; } 
   else if (_h>=180) { seg=3; delta = _h-180; }
   else if (_h>=120) { seg=2; delta = _h-120; }
   else if (_h>=60)  { seg=1; delta = _h-60; }
   else              { seg=0; delta = _h-0; }
-
+  
   delta = 4*delta + delta/4; // Range: [0...250]
 
   uint8_t p = (v * (255 - s)) >> 12;
   uint8_t q = (v * (255 - ((s * delta) >> 8))) >> 12;
   uint8_t t = (v * (255 - ((s * (255 - delta)) >> 8))) >> 12;
-
+ 
   v >>= 4;
-
+  
   switch (seg) {
     case 0: return rgb(v, t, p);
     case 1: return rgb(q, v, p);

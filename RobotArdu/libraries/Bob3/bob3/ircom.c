@@ -6,7 +6,6 @@
 #include "iodefs.h"
 #include "ircom.h"
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,26 +18,16 @@ extern "C" {
 #define AMUX_TEMP 0x08
 #define AMUX_1V1  0x0e
 #define AMUX_0V   0x0f
-
   
-#if defined(ARDUINO)
-void _time_suspend();
-void _time_resume();
-#else
-inline static void _time_suspend() {}
-inline static void _time_resume() {}
-#endif
-
   
 static void start_timer(uint8_t carrier) {
   TCCR1A = 0;
-  TCCR1B = _BV(WGM12) | _BV(CS11); // CTC[OCR1A], PS=8
+  TCCR1B = _BV(WGM12) | _BV(CS11); // CTC, PS=8
   OCR1A = 250-1; // 250 us  
 }
 
 static void stop_timer() {
-  TCCR1B = 0;
-  _time_resume();
+  TCCR1B = 0;    
 }
 
 static void wait_timer() {

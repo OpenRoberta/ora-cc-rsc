@@ -139,9 +139,6 @@ void delay(unsigned long ms)
 	}
 }
 
-#endif // !defined(ARDUINO_AVR_BOB3)
-
-
 /* Delay for the given number of microseconds.  Assumes a 1, 8, 12, 16, 20 or 24 MHz clock. */
 void delayMicroseconds(unsigned int us)
 {
@@ -265,6 +262,15 @@ void delayMicroseconds(unsigned int us)
 }
 
 
+#else  // !defined(ARDUINO_AVR_BOB3)
+// void delayMicroseconds(unsigned int us) -> in library
+
+
+#endif // !defined(ARDUINO_AVR_BOB3)
+
+
+
+
 #if defined(ARDUINO_AVR_NIBO2)
 void pwm_init() __attribute__((weak));
 void pwm_init() {}
@@ -289,6 +295,7 @@ void init()
 	pid_init();
 #elif defined(ARDUINO_AVR_BOB3)
 	bob3_init();
+        return;
 #endif
 	
 #if defined(ARDUINO_USE_TIMER0)

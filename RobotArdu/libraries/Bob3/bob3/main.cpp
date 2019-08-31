@@ -40,5 +40,4 @@ extern "C" void bob3_init() {
   _time_resume();
 }
 
-
 #endif

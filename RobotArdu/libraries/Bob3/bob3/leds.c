@@ -8,10 +8,11 @@
 
 #include "iodefs.h"
 #include "leds.h"
+#include "clock.h"
 
 void leds_init() {
   // setup output bits
-  PORTD  |= 0x68;
+  PORTD |= 0x68;
   DDRD  |= 0x68;
   DDRB  |= 0xc6;
   
@@ -29,34 +30,35 @@ void leds_init() {
 }
 
 
-uint8_t led_r1;
-uint8_t led_g1;
-uint8_t led_b1;
-uint8_t led_r2;
-uint8_t led_g2;
-uint8_t led_b2;
+static uint8_t led_r1;
+static uint8_t led_g1;
+static uint8_t led_b1;
+static uint8_t led_r2;
+static uint8_t led_g2;
+static uint8_t led_b2;
 
-uint16_t eye1col;
-uint16_t eye2col;
-uint8_t eye;
+static uint16_t eye1col;
+static uint16_t eye2col;
+static uint8_t eye;
 
 
 ISR(TIMER0_OVF_vect) {
   if (eye) {
-    PORTB|=_BV(1);
-    PORTB&=~_BV(2);
+    PORTB |= _BV(1);
+    PORTB &= ~_BV(2);
     OCR0A = led_r2;
     OCR0B = led_g2;
     OCR2B = led_b2;
-    eye=0;
+    eye = 0;
   } else {
-    PORTB|=_BV(2);
-    PORTB&=~_BV(1);
+    PORTB |= _BV(2);
+    PORTB &= ~_BV(1);
     OCR0A = led_r1;
     OCR0B = led_g1;
     OCR2B = led_b1;
-    eye=1;
+    eye = 1;
   }
+  _clock_handle_interrupt_isr();
 }
 
 

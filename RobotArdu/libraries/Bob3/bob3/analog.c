@@ -49,14 +49,25 @@ extern "C" {
 #endif
 
 extern uint8_t _bob3_revision;
+extern uint8_t _bob3_edition; // 0=THT 1=SMD
+#define BOB3_EDITION_THT 0
+#define BOB3_EDITION_SMD 1
+
+extern uint8_t _arm_mode;
 
 uint16_t analog_samples[2 * ANALOG_CNT];
 
 uint16_t analog_random_seed;
-uint8_t analog_pos;
-uint8_t analog_flags;
+//uint8_t analog_pos;
+//uint8_t analog_flags;
 volatile uint8_t analog_sample_id;
 uint16_t analog_sum;
+uint16_t analog_irq_temp;
+
+// Interrupt
+uint8_t analog_ui_ch;
+uint8_t analog_ui_cnt;
+uint8_t analog_first = 1;
 
 #define AREF_1V1(x) (_BV(REFS1)|_BV(REFS0)|((x)))
 #define AREF_AVCC(x) (_BV(REFS0)|((x)))
@@ -66,6 +77,8 @@ uint16_t analog_sum;
 #define AMUX_0V   0x0f
 
 void analog_init() {
+  analog_first = 1;
+  analog_ui_ch = 3;
 #if defined(DIDR0)
 //  DIDR0 = 0xff;
 #endif
@@ -105,8 +118,11 @@ void analog_init() {
 uint8_t analog_enable(uint8_t enable) {
   uint8_t result = (ADCSRA & _BV(ADIE))?0xff:0x00;
   if (enable) {
-    ADCSRA |= _BV(ADEN);
-    ADCSRA |= _BV(ADIE);  
+    ADCSRA = _BV(ADPS2)  // prescale faktor = 64 ADC laeuft
+           | _BV(ADPS0)  // mit 8 MHz / 32 = 250 kHz
+           | _BV(ADEN)   // ADC an
+           | _BV(ADIE)   // enable interrupt
+           | _BV(ADSC);  // Beginne mit der Konvertierung
   } else {
     ADCSRA &= ~_BV(ADIE);
     ADCSRA &= ~_BV(ADEN);
@@ -155,7 +171,20 @@ uint16_t analog_getValueExt(uint8_t idx, uint8_t active) {
     uint8_t idx2 = idx+ANALOG_CNT;
     int16_t val = 0;
     //ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-    if (idx<8) {
+    if (idx==ANALOG_IR) {
+      uint8_t bak = SREG;
+      cli();
+      val = analog_samples[idx2]; // ON
+      uint16_t val2 = analog_samples[idx]; // OFF
+      val -= val2;
+      if (_bob3_edition==BOB3_EDITION_SMD) {
+        val = (val>10)?(val-10):0;
+        val /= 2U;
+      }
+      val2 /= 32U;
+      val = (val>val2)?(val-val2):0;
+      SREG = bak;
+    } else if (idx<8) {
       // inverted signal: 1023 == no touch
       uint8_t bak = SREG;
       cli();
@@ -268,22 +297,81 @@ void _key_update_event() {
 #endif
 
 
-#define CASE_ADC(CASE, ANALOG_CH, IO_EN_BIT, AREF, APORT) \
-    case CASE+STD0: \
-      ADMUX = AREF(APORT); \
-      PORTC &= ~_BV(APORT);\
-      DDRC |= _BV(APORT);\
-      DDRC &= ~_BV(APORT);\
-      PORTC |= _BV(APORT);\
-      break; \
-    case CASE+STD2: \
-      analog_samples[ANALOG_CH]=value; \
-      set_output_bit(IO_EN_BIT); \
-      break; \
-    case CASE+STD5: \
-      analog_samples[ANALOG_CH+ANALOG_CNT]=value; \
-      clear_output_bit(IO_EN_BIT); \
-      break;
+// **** IR Sensor ****
+static inline void analog_ai_ir(uint16_t value) {
+  if (analog_ui_cnt==0) {
+    ADMUX = AREF_1V1(IOG_ANALOG_BIT_SENS_IR);
+  } else if (analog_ui_cnt==6) {
+    ADMUX = AREF_1V1(IOG_ANALOG_BIT_SENS_IR);
+    PORTC &= ~_BV(IOG_ANALOG_BIT_SENS_IR);
+    DDRC |= _BV(IOG_ANALOG_BIT_SENS_IR);
+    DDRC &= ~_BV(IOG_ANALOG_BIT_SENS_IR);
+    PORTC |= _BV(IOG_ANALOG_BIT_SENS_IR);
+  } else if (analog_ui_cnt==8) {
+    analog_sum = value;
+  } else if (analog_ui_cnt==9) {
+    analog_sum += value;
+  } else if (analog_ui_cnt==10) {
+    analog_sum += value;
+  } else if (analog_ui_cnt==11) {
+    analog_sum += value;
+    analog_irq_temp = analog_sum/4;
+    activate_output_bit(IO_EN_IR);
+    set_output_bit(IO_EN_IR);
+  } else if (analog_ui_cnt==14) {
+    analog_sum = value;
+  } else if (analog_ui_cnt==15) {
+    analog_sum += value;
+  } else if (analog_ui_cnt==16) {
+    analog_sum += value;
+  } else if (analog_ui_cnt==17) {
+    analog_sum += value;
+    analog_samples[ANALOG_IR+ANALOG_CNT] = analog_sum/4;
+    analog_samples[ANALOG_IR] = analog_irq_temp;
+    clear_output_bit(IO_EN_IR);
+    analog_ui_cnt = 0;
+    return;
+  }
+  analog_ui_cnt++;
+}
+
+
+// **** Temperature Sensor ****
+static inline void analog_ai_temp(uint16_t value) {
+  if (analog_ui_cnt==0) {
+    ADMUX = AREF_1V1(AMUX_TEMP);
+  } else if (analog_ui_cnt==4) {
+    analog_sum = value;
+  } else if (analog_ui_cnt==5) {
+    analog_sum += value;
+  } else if (analog_ui_cnt==6) {
+    analog_sum += value;
+  } else if (analog_ui_cnt==7) {
+    analog_sum += value;
+    value = analog_sum;
+    analog_samples[ANALOG_TEMP] = value;
+    value += 7*analog_samples[ANALOG_CNT+ANALOG_TEMP] + 4;
+    value /= 8;
+    analog_samples[ANALOG_CNT+ANALOG_TEMP] = value;
+    analog_ui_cnt = 0;
+    return;
+  }
+  analog_ui_cnt++;
+}
+
+
+// **** Supply Voltage Sensor ****
+static inline void analog_ai_volt(uint16_t value) {
+  if (analog_ui_cnt==0) {
+    ADMUX = AREF_AVCC(AMUX_1V1);
+  } else if (analog_ui_cnt==2) {
+    analog_samples[ANALOG_VOLT] = value;
+    analog_ui_cnt = 0;
+    return;
+  }
+  analog_ui_cnt++;
+}
+
 
       
 #define CASE_ADC_KEY(CASE, ANALOG_CH, IO_EN_BIT, AREF, APORT) \
@@ -305,119 +393,149 @@ void _key_update_event() {
       analog_samples[ANALOG_CH]=updateKey(analog_samples[ANALOG_CH], analog_sum/4); \
       break;
 
-      
-#define CASE_ADC2(CASE, ANALOG_CH, IO_EN_BIT, AREF, APORT) \
-    case CASE+STD0: \
-      ADMUX = AREF(APORT); \
-      PORTC &= ~_BV(APORT);\
-      DDRC |= _BV(APORT);\
-      DDRC &= ~_BV(APORT);\
-      PORTC |= _BV(APORT);\
-      break; \
-    case CASE+STD2: \
-      analog_sum = value; \
-      break; \
-    case CASE+STD2+1: \
-      analog_sum += value; \
-      break; \
-    case CASE+STD2+2: \
-      analog_sum += value; \
-      break; \
-    case CASE+STD2+3: \
-      analog_sum += value; \
-      analog_samples[ANALOG_CH] = analog_sum/4; \
-      activate_output_bit(IO_EN_BIT); \
-      set_output_bit(IO_EN_BIT); \
-      break; \
-    case CASE+STD2+STD3+3: \
-      analog_sum = value; \
-      break; \
-    case CASE+STD2+STD3+4: \
-      analog_sum += value; \
-      break; \
-    case CASE+STD2+STD3+5: \
-      analog_sum += value; \
-      break; \
-    case CASE+STD2+STD3+6: \
-      analog_sum += value; \
-      analog_samples[ANALOG_CH+ANALOG_CNT] = analog_sum/4; \
-      clear_output_bit(IO_EN_BIT); \
-      break;
+   
+// **** Supply Voltage Sensor ****
+static inline void analog_ai_key_v102(uint16_t value) {
+  switch (analog_ui_cnt) {
+        CASE_ADC_KEY(0*STD6, ANALOG_L0,  IO_ARM_1R, AREF_AVCC, IOG_ANALOG_BIT_ARM_U)
+        CASE_ADC_KEY(1*STD6, ANALOG_L1,  IO_ARM_1C, AREF_AVCC, IOG_ANALOG_BIT_ARM_U)
+        CASE_ADC_KEY(2*STD6, ANALOG_L2,  IO_ARM_1C, AREF_AVCC, IOG_ANALOG_BIT_ARM_L)
+        CASE_ADC_KEY(3*STD6, ANALOG_L3,  IO_ARM_1R, AREF_AVCC, IOG_ANALOG_BIT_ARM_L)
+        CASE_ADC_KEY(4*STD6, ANALOG_R0,  IO_ARM_2R, AREF_AVCC, IOG_ANALOG_BIT_ARM_U)
+        CASE_ADC_KEY(5*STD6, ANALOG_R1,  IO_ARM_2C, AREF_AVCC, IOG_ANALOG_BIT_ARM_U)
+        CASE_ADC_KEY(6*STD6, ANALOG_R2,  IO_ARM_2C, AREF_AVCC, IOG_ANALOG_BIT_ARM_L)
+        CASE_ADC_KEY(7*STD6, ANALOG_R3,  IO_ARM_2R, AREF_AVCC, IOG_ANALOG_BIT_ARM_L)
+  }    
+  analog_ui_cnt++;
+  if (analog_ui_cnt >= 8*STD6) {
+    analog_ui_cnt = 0;
+  }
+} 
+
+// **** Supply Voltage Sensor ****
+static inline void analog_ai_key_v103(uint16_t value) {
+  switch (analog_ui_cnt) {
+        CASE_ADC_KEY(0*STD6, ANALOG_L0,  IO_ARM2_TA, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S1)
+        CASE_ADC_KEY(1*STD6, ANALOG_L1,  IO_ARM2_TB, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S1)
+        CASE_ADC_KEY(2*STD6, ANALOG_L2,  IO_ARM2_TB, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S1)
+        CASE_ADC_KEY(3*STD6, ANALOG_L3,  IO_ARM2_TC, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S1)
+        CASE_ADC_KEY(4*STD6, ANALOG_R0,  IO_ARM2_TA, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S2)
+        CASE_ADC_KEY(5*STD6, ANALOG_R1,  IO_ARM2_TB, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S2)
+        CASE_ADC_KEY(6*STD6, ANALOG_R2,  IO_ARM2_TB, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S2)
+        CASE_ADC_KEY(7*STD6, ANALOG_R3,  IO_ARM2_TC, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S2)
+  }  
+  analog_ui_cnt++;
+  if (analog_ui_cnt >= 8*STD6) {
+    analog_ui_cnt = 0;
+  }
+}      
+
+// **** Supply Voltage Sensor ****
+static inline void analog_ai_key_detect(uint16_t value) {
+  switch (analog_ui_cnt) {
+        case 0:
+          // set all arm output pins to vcc level
+          set_output_bit(IO_ARM2_TA);
+          set_output_bit(IO_ARM2_TB);
+          set_output_bit(IO_ARM2_TC);
+          activate_output_bit(IO_ARM2_TA);
+          activate_output_bit(IO_ARM2_TB);
+          activate_output_bit(IO_ARM2_TC);
+          // enable pull-ups on arm input pins
+          deactivate_output_bit(IO_ARM2_S1);
+          deactivate_output_bit(IO_ARM2_S2);
+          set_output_bit(IO_ARM2_S1);
+          set_output_bit(IO_ARM2_S2);
+          ADMUX = AREF_AVCC(IOG_ANALOG_BIT_ARM2_S1);
+          break;
+
+        case 2*STD6:
+          analog_sum = value;
+          break;
+        case 2*STD6+1:
+          analog_sum += value;
+          break;
+        case 2*STD6+2:
+          analog_sum += value;
+          break;
+        case 2*STD6+3:
+          analog_sum += value;
+          break;
+        case 2*STD6+4:
+          analog_sum /= 2;
+          analog_sum += 15*analog_samples[ANALOG_L0]+7;
+          analog_sum /= 16;
+          break;
+        case 2*STD6+5:
+          analog_samples[ANALOG_L0] = analog_sum;
+          ADMUX = AREF_AVCC(IOG_ANALOG_BIT_ARM2_S2);
+          break;
+
+        case 4*STD6:
+          analog_sum = value;
+          break;
+        case 4*STD6+1:  
+          analog_sum += value;
+          break;
+        case 4*STD6+2:
+          analog_sum += value;
+          break;
+        case 4*STD6+3:
+          analog_sum += value;
+          break;
+        case 4*STD6+4:
+          analog_sum /= 2;
+          analog_sum += 15*analog_samples[ANALOG_R0]+7;
+          analog_sum /= 16;
+          break;
+        case 4*STD6+5:
+          analog_samples[ANALOG_R0] = analog_sum;
+          break;
+  }  
+  analog_ui_cnt++;
+  if (analog_ui_cnt >= 8*STD6) {
+    analog_ui_cnt = 0;
+  }
+}
+
 
 
 ISR(ADC_vect) {
   uint16_t value = ADC;
   sei();
+  switch (analog_ui_ch) {
+    // Vcc Voltage Ref
+    case 0: analog_ai_key_v102(value); break;
+    case 1: analog_ai_key_v103(value); break;
+    case 2: analog_ai_key_detect(value); break;
+    
+    // 1.1V Voltage Ref
+    case 3: analog_ai_ir(value); break;
+    case 4: analog_ai_temp(value); break;
+    
+    // Vcc Voltage Ref
+    case 5: analog_ai_volt(value); break;
+  }
   
-  if (_bob3_revision==102) {
-    // BOB3 V1.2
-    switch (analog_pos) {
-      CASE_ADC_KEY(0*STD6, ANALOG_L0,  IO_ARM_1R, AREF_AVCC, IOG_ANALOG_BIT_ARM_U)
-      CASE_ADC_KEY(1*STD6, ANALOG_L1,  IO_ARM_1C, AREF_AVCC, IOG_ANALOG_BIT_ARM_U)
-      CASE_ADC_KEY(2*STD6, ANALOG_L2,  IO_ARM_1C, AREF_AVCC, IOG_ANALOG_BIT_ARM_L)
-      CASE_ADC_KEY(3*STD6, ANALOG_L3,  IO_ARM_1R, AREF_AVCC, IOG_ANALOG_BIT_ARM_L)
-      CASE_ADC_KEY(4*STD6, ANALOG_R0,  IO_ARM_2R, AREF_AVCC, IOG_ANALOG_BIT_ARM_U)
-      CASE_ADC_KEY(5*STD6, ANALOG_R1,  IO_ARM_2C, AREF_AVCC, IOG_ANALOG_BIT_ARM_U)
-      CASE_ADC_KEY(6*STD6, ANALOG_R2,  IO_ARM_2C, AREF_AVCC, IOG_ANALOG_BIT_ARM_L)
-      CASE_ADC_KEY(7*STD6, ANALOG_R3,  IO_ARM_2R, AREF_AVCC, IOG_ANALOG_BIT_ARM_L)
-      case 8*STD6:
-        ADMUX = AREF_1V1(IOG_ANALOG_BIT_SENS_IR);
-        break;
-      CASE_ADC2(9*STD6, ANALOG_IR,  IO_EN_IR, AREF_1V1, IOG_ANALOG_BIT_SENS_IR)
-      case 11*STD6:
-        ADMUX = AREF_1V1(AMUX_TEMP);
-        break;
-      case 11*STD6+STD4:
-        analog_sum = value;
-        break;
-      case 11*STD6+STD4+1:
-        analog_samples[ANALOG_TEMP] = (analog_sum+value)>>1;
-        break;
-      case 12*STD6:
-        ADMUX = AREF_AVCC(AMUX_1V1);
-        break;      
-      case 12*STD6+STD2: {
-        analog_samples[ANALOG_VOLT] = value;
-      } break;
+  if (analog_ui_cnt==0) {
+    if (analog_ui_ch<3) analog_ui_ch=3;
+    else if (analog_ui_ch<5) analog_ui_ch++;
+    else if (_bob3_revision==102) analog_ui_ch=0;
+    else if (_arm_mode==1) analog_ui_ch=1;
+    else if (_arm_mode==2) analog_ui_ch=2;
+    else analog_ui_ch=0;
+    
+    if (analog_ui_ch<3) {
+      analog_irq_hook();
+      analog_sample_id++;
+      analog_random_seed<<=1;
+      if (analog_first) {
+        analog_first = 0;
+        analog_samples[ANALOG_TEMP+ANALOG_CNT] = analog_samples[ANALOG_TEMP];
+      }
     }
-  } else if (_bob3_revision==103) {
-    // BOB3 V1.3
-    switch (analog_pos) {
-      CASE_ADC_KEY(0*STD6, ANALOG_L0,  IO_ARM2_TA, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S1)
-      CASE_ADC_KEY(1*STD6, ANALOG_L1,  IO_ARM2_TB, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S1)
-      CASE_ADC_KEY(2*STD6, ANALOG_L2,  IO_ARM2_TB, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S1)
-      CASE_ADC_KEY(3*STD6, ANALOG_L3,  IO_ARM2_TC, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S1)
-      CASE_ADC_KEY(4*STD6, ANALOG_R0,  IO_ARM2_TA, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S2)
-      CASE_ADC_KEY(5*STD6, ANALOG_R1,  IO_ARM2_TB, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S2)
-      CASE_ADC_KEY(6*STD6, ANALOG_R2,  IO_ARM2_TB, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S2)
-      CASE_ADC_KEY(7*STD6, ANALOG_R3,  IO_ARM2_TC, AREF_AVCC, IOG_ANALOG_BIT_ARM2_S2)
-      case 8*STD6:
-        ADMUX = AREF_1V1(IOG_ANALOG_BIT_SENS_IR);
-        break;
-      CASE_ADC2(9*STD6, ANALOG_IR,  IO_EN_IR, AREF_1V1, IOG_ANALOG_BIT_SENS_IR)
-      case 11*STD6:
-        ADMUX = AREF_1V1(AMUX_TEMP);
-        break;
-      case 11*STD6+STD4:
-        analog_sum = value;
-        break;
-      case 11*STD6+STD4+1:
-        analog_samples[ANALOG_TEMP] = (analog_sum+value)>>1;
-        break;
-      case 12*STD6:
-        ADMUX = AREF_AVCC(AMUX_1V1);
-        break;      
-      case 12*STD6+STD2: {
-        analog_samples[ANALOG_VOLT] = value;
-      } break;
-    }    
   }
-  if (++analog_pos>(12*STD6+STD2)) {
-    analog_pos=0;
-    analog_irq_hook();
-    analog_sample_id++;
-    analog_random_seed<<=1;
-  }
+  
   analog_random_seed += value;
   ADCSRA |= _BV(ADSC);
 }

@@ -1,2 +1,2 @@
-#define VERSION "3.5"
-#define SVN_REVISION "315M"
+#define VERSION "3.6.1"
+#define SVN_REVISION "316:318M"
