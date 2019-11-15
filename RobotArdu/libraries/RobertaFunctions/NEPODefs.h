@@ -34,7 +34,7 @@
 #define BCHANNEL(color) ((uint8_t)(color))
 #endif
 
-#ifndef _SENSEBOX_INCLUDES
+#ifndef _ARDUINO_STL_NOT_NEEDED
 #include <ArduinoSTL.h>
 #endif
 
