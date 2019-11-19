@@ -164,7 +164,9 @@ void Rev(uint8_t Outputs);
 
 void OnFwdEx(uint8_t Outputs, int8_t Power, uint8_t reset);
 
-void OnRevEx(uint8_t Outputs, int8_t Power, uint8_t reset);
+void inline OnRevEx(uint8_t Outputs, int8_t Power, uint8_t reset) {
+    OnFwdEx(Outputs, -Power, reset);
+}
 
 #define OnFwd(_outputs) OnFwdEx((_outputs), OUT_POWER_DEFAULT, RESET_NONE)
 
@@ -172,7 +174,9 @@ void OnRevEx(uint8_t Outputs, int8_t Power, uint8_t reset);
 
 void OnFwdRegEx(uint8_t Outputs, int8_t Speed, uint8_t RegMode, uint8_t reset);
 
-void OnRevRegEx(uint8_t Outputs, int8_t Speed, uint8_t RegMode, uint8_t reset);
+void inline OnRevRegEx(uint8_t Outputs, int8_t Speed, uint8_t RegMode, uint8_t reset) {
+    OnFwdRegEx(Outputs, -Speed, RegMode, reset);
+}
 
 #define OnFwdReg(_outputs, _speed) OnFwdRegEx((_outputs), (_speed), OUT_REGMODE_SPEED, RESET_NONE)
 
@@ -180,7 +184,9 @@ void OnRevRegEx(uint8_t Outputs, int8_t Speed, uint8_t RegMode, uint8_t reset);
 
 void OnFwdSyncEx(uint8_t Outputs, int8_t Speed, short Turn, uint8_t reset);
 
-void OnRevSyncEx(uint8_t Outputs, int8_t Speed, short Turn, uint8_t reset);
+void inline OnRevSyncEx(uint8_t Outputs, int8_t Speed, short Turn, uint8_t reset) {
+    OnFwdSyncEx(Outputs, -Speed, Turn, reset);
+}
 
 #define OnFwdSync(_outputs, _speed) OnFwdSyncEx((_outputs), (_speed), 0, RESET_NONE)
 
