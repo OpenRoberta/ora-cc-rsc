@@ -51,6 +51,19 @@ inline unsigned RGB(unsigned r, unsigned g, unsigned b) {
 }
 #endif
 
+inline int get_microphone_max(int microphone_port) {
+    int tmp = 0;
+    int max = 0;
+    for (int i = 0; i < 32; i++) {
+        tmp = analogRead(microphone_port);
+        if (tmp > max) {
+            max = tmp;
+        } 
+    }
+    return max;
+}
+
+
 //inline unsigned RGB(unsigned r, unsigned g, unsigned b) {
 //    return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b & 0xF8) >> 3));
 //}
