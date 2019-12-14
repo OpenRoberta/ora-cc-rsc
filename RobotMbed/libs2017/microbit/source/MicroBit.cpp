@@ -74,9 +74,9 @@ MicroBit::MicroBit() :
     buttonA(MICROBIT_PIN_BUTTON_A, MICROBIT_ID_BUTTON_A),
     buttonB(MICROBIT_PIN_BUTTON_B, MICROBIT_ID_BUTTON_B),
     buttonAB(MICROBIT_ID_BUTTON_A,MICROBIT_ID_BUTTON_B, MICROBIT_ID_BUTTON_AB),
-    accelerometer(i2c),
-    compass(i2c, accelerometer, storage),
-    compassCalibrator(compass, accelerometer, display),
+    accelerometer(MicroBitAccelerometer::autoDetect(i2c)),
+    compass(MicroBitCompass::autoDetect(i2c)),
+    compassCalibrator(compass, accelerometer, display, storage),
     thermometer(storage),
     io(MICROBIT_ID_IO_P0,MICROBIT_ID_IO_P1,MICROBIT_ID_IO_P2,
        MICROBIT_ID_IO_P3,MICROBIT_ID_IO_P4,MICROBIT_ID_IO_P5,
@@ -124,14 +124,6 @@ void MicroBit::init()
     if (status & MICROBIT_INITIALIZED)
         return;
 
-    // configure the accelerometer
-    accelerometer.configure();
-
-#if CONFIG_ENABLED(MICROBIT_HEAP_ALLOCATOR)
-    // Bring up a nested heap allocator.
-    microbit_create_nested_heap(MICROBIT_NESTED_HEAP_SIZE);
-#endif
-
     // Bring up fiber scheduler.
     scheduler_init(messageBus);
 
@@ -146,17 +138,35 @@ void MicroBit::init()
     status |= MICROBIT_INITIALIZED;
 
 #if CONFIG_ENABLED(MICROBIT_BLE_PAIRING_MODE)
-    // Test if we need to enter BLE pairing mode...
     int i=0;
+    // Test if we need to enter BLE pairing mode
+    // If a RebootMode Key has been set boot straight into BLE mode
+    KeyValuePair* RebootMode = storage.get("RebootMode");
+    KeyValuePair* flashIncomplete = storage.get("flashIncomplete");
     sleep(100);
-    while (buttonA.isPressed() && buttonB.isPressed() && i<10)
+    // Animation
+    uint8_t x = 0; uint8_t y = 0;
+    while ((buttonA.isPressed() && buttonB.isPressed() && i<25) || RebootMode != NULL || flashIncomplete != NULL)
     {
-        sleep(100);
-        i++;
+        display.image.setPixelValue(x,y,255);
+        sleep(50);
+        i++; x++;
 
-        if (i == 10)
+        // Gradually fill screen
+        if(x == 5){
+          y++; x = 0;
+        }
+
+        if (i == 25 || RebootMode != NULL)
         {
-#if CONFIG_ENABLED(MICROBIT_HEAP_ALLOCATOR) && CONFIG_ENABLED(MICROBIT_HEAP_REUSE_SD)
+            // Remove KV if it exists
+            if(RebootMode != NULL){
+                storage.remove("RebootMode");
+            }
+            delete RebootMode;
+            delete flashIncomplete;
+
+#if CONFIG_ENABLED(MICROBIT_HEAP_REUSE_SD)
             microbit_create_heap(MICROBIT_SD_GATT_TABLE_START + MICROBIT_SD_GATT_TABLE_SIZE, MICROBIT_SD_LIMIT);
 #endif
             // Start the BLE stack, if it isn't already running.
@@ -173,7 +183,7 @@ void MicroBit::init()
 #endif
 
     // Attempt to bring up a second heap region, using unused memory normally reserved for Soft Device.
-#if CONFIG_ENABLED(MICROBIT_HEAP_ALLOCATOR) && CONFIG_ENABLED(MICROBIT_HEAP_REUSE_SD)
+#if CONFIG_ENABLED(MICROBIT_HEAP_REUSE_SD)
 #if CONFIG_ENABLED(MICROBIT_BLE_ENABLED)
     microbit_create_heap(MICROBIT_SD_GATT_TABLE_START + MICROBIT_SD_GATT_TABLE_SIZE, MICROBIT_SD_LIMIT);
 #else
@@ -218,8 +228,7 @@ void MicroBit::onListenerRegisteredEvent(MicroBitEvent evt)
         case MICROBIT_ID_COMPASS:
             // A listener has been registered for the compass.
             // The compass uses lazy instantiation, we just need to read the data once to start it running.
-            // Touch the compass through the heading() function to ensure it is calibrated. if it isn't this will launch any associated calibration algorithms.
-            compass.heading();
+            compass.getSample();
 
             break;
 
@@ -227,7 +236,7 @@ void MicroBit::onListenerRegisteredEvent(MicroBitEvent evt)
         case MICROBIT_ID_GESTURE:
             // A listener has been registered for the accelerometer.
             // The accelerometer uses lazy instantiation, we just need to read the data once to start it running.
-            accelerometer.updateSample();
+            accelerometer.getSample();
             break;
 
         case MICROBIT_ID_THERMOMETER:

@@ -91,6 +91,12 @@ void ManagedString::initString(const char *str)
   */
 ManagedString::ManagedString(StringData *p)
 {
+    if(p == NULL)
+    {
+        initEmpty();
+        return;
+    }
+
     ptr = p;
     ptr->incr();
 }
@@ -421,7 +427,7 @@ bool ManagedString::operator== (const ManagedString& s)
   */
 bool ManagedString::operator!= (const ManagedString& s)
 {
-    return ((length() != s.length()) || (strcmp(toCharArray(),s.toCharArray())!=0));
+    return ((length() != s.length()) && (strcmp(toCharArray(),s.toCharArray())!=0));
 }
 
 /**

@@ -30,7 +30,7 @@ DEALINGS IN THE SOFTWARE.
 #include "ble/BLE.h"
 #include "MicroBitIO.h"
 
-#define MICROBIT_IO_PIN_SERVICE_PINCOUNT       19
+#define MICROBIT_IO_PIN_SERVICE_PINCOUNT       20
 #define MICROBIT_IO_PIN_SERVICE_DATA_SIZE      10
 #define MICROBIT_PWM_PIN_SERVICE_DATA_SIZE     2
 
@@ -122,15 +122,15 @@ class MicroBitIOPinService : public MicroBitComponent
       * @param i the enumeration of the pin to test
       * @return 1 if this pin is configured as an input, 0 otherwise
       */
-    int isInput(int i);
+    int isActiveInput(int i);
 
     /**
-      * Determines if the given pin was configured as output by the BLE IOPinConfigurationCharacterisitic.
-      *
-      * @param i the enumeration of the pin to test
-      * @return 1 if this pin is configured as an output, 0 otherwise
-      */
-    int isOutput(int i);
+     * Scans through all pins that our BLE client have registered an interest in. 
+     * For each pin that has changed value, update the BLE characteristic, and NOTIFY our client.
+     * @param updateAll if true, a notification will be sent for all registered inputs. Otherwise, 
+     * a notification will only be sent for inputs that have changed value.
+     */
+    void updateBLEInputs(bool updateAll = false);
 
 
     // Bluetooth stack we're running on.
