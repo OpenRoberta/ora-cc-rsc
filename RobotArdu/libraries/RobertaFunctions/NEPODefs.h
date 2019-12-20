@@ -40,6 +40,7 @@
 
 #include <list>
 #include <math.h>
+#include <vector>
 
 #ifndef _BOB3_INCLUDES
 inline uint32_t RGB(uint8_t r, uint8_t g, uint8_t b) {
@@ -268,5 +269,99 @@ void assertNepo(bool test, String text, T left, String op, U right) {
                 "Assertion failed: " + text + " " + left + " " + op + " "
                         + right);
         Serial.flush();
+    }
+}
+
+std::vector<uint8_t> invertLEDMatrixVec(std::vector<uint8_t> &arr) { 
+    for (uint8_t i = 0; i < 16; i++) { 
+        arr[i]=~(byte)arr[i];
+    }  
+    return arr;
+}
+
+std::vector<uint8_t> invertLEDMatrixArr(uint8_t *arr) {
+    std::vector<uint8_t> myvec(arr, arr + 16);
+    return invertLEDMatrixVec(myvec);
+}
+
+std::vector<uint8_t> shiftLEDMatrixRightVec(std::vector<uint8_t> arr, int shift) {
+    if (shift > 0) {
+        arr.insert(arr.begin(), shift, 0);
+        arr.erase(arr.end(), arr.end() - shift);
+    } else if (shift < 0) {
+        arr.erase(arr.begin(), arr.begin() - shift);
+        arr.insert(arr.end(), -shift, 0);
+    }
+    return arr;
+}
+std::vector<uint8_t> shiftLEDMatrixRightArr( uint8_t arr[16], int shift) {
+    std::vector<uint8_t> myvec(arr, arr + 16);
+    return shiftLEDMatrixRightVec(myvec, shift);
+}
+
+std::vector<uint8_t> shiftLEDMatrixLeftVec(std::vector<uint8_t> arr, int shift) {
+    if (shift < 0) {
+        arr.erase(arr.begin(), arr.begin() - shift);
+        arr.insert(arr.end(), -shift, 0);
+    } else if (shift > 0) {
+        arr.erase(arr.begin(), arr.begin() + shift);
+        arr.insert(arr.end(), shift, 0);      
+    }
+    return arr;
+}
+std::vector<uint8_t> shiftLEDMatrixLeftArr( uint8_t arr[16], int shift) {
+    std::vector<uint8_t> myvec(arr, arr + 16);
+    return shiftLEDMatrixLeftVec(myvec, shift);
+}
+
+std::vector<uint8_t> shiftLEDMatrixUpVec(std::vector<uint8_t> arr, int shift) {
+    if (shift > 0) {
+        for (uint8_t i = 0; i < 16; i++) { 
+            arr[i]=(byte)arr[i] << shift;
+        } 
+    } else if (shift < 0) {
+        for (uint8_t i = 0; i < 16; i++) { 
+            arr[i]=(byte)arr[i] >> -shift;
+        } 
+    }
+    return arr;
+}
+std::vector<uint8_t> shiftLEDMatrixUpArr(uint8_t arr[16], int shift) {
+    std::vector<uint8_t> myvec(arr, arr + 16);
+    return shiftLEDMatrixUpVec(myvec, shift);
+}
+
+std::vector<uint8_t> shiftLEDMatrixDownVec(std::vector<uint8_t> arr, int shift) {
+    if (shift < 0) {
+        for (uint8_t i = 0; i < 16; i++) { 
+            arr[i]=(byte)arr[i] << -shift;
+        } 
+    } else if (shift > 0) {
+        for (uint8_t i = 0; i < 16; i++) { 
+            arr[i]=(byte)arr[i] >> shift;
+        } 
+    }
+    return arr;
+}
+
+std::vector<uint8_t> shiftLEDMatrixDownArr( uint8_t arr[16], int shift) {
+    std::vector<uint8_t> myvec(arr, arr + 16);
+    return shiftLEDMatrixDownVec(myvec, shift);
+}
+
+void drawStrLEDMatrix(MeLEDMatrix *meLEDMatrix, const String &str, int tmp ) {
+    meLEDMatrix->drawStr(0, 7, str.c_str());
+    delay(tmp * 3);
+    int size = (str.length() * 6) - 16;
+    for (int i = -1; i >= -size; i--) {
+        meLEDMatrix->drawStr(i, 7, str.c_str());
+        delay(tmp);
+    }
+}
+
+void drawAnimationLEDMatrix(MeLEDMatrix *meLEDMatrix, std::list<std::vector<uint8_t>> &arr, int tmp ) {
+    for (std::list<std::vector<uint8_t>>::iterator it = arr.begin(); it != arr.end(); ++it){
+        meLEDMatrix->drawBitmap(0, 0, 16, &(*it)[0]);
+        delay(tmp);
     }
 }
