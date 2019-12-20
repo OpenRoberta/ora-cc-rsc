@@ -7,6 +7,10 @@
 #include <utils.h>
 #include <stdlib.h>
 
+#ifndef _CLAMP
+#define _CLAMP(x, lower, upper) (( (x) > (upper) ) ? (upper) : ( (x) < (lower) ? (lower) : (x) ))
+#endif
+
 inline unsigned RGB(unsigned r, unsigned g, unsigned b) {
     return ((r & 0xF0) << 4) | (g & 0xF0) | ((b & 0xF0) >> 4);
 }
