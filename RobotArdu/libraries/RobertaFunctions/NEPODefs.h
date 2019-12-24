@@ -272,6 +272,8 @@ void assertNepo(bool test, String text, T left, String op, U right) {
     }
 }
 
+
+#ifdef MeMCore_H
 std::vector<uint8_t> invertLEDMatrixVec(std::vector<uint8_t> &arr) { 
     for (uint8_t i = 0; i < 16; i++) { 
         arr[i]=~(byte)arr[i];
@@ -365,3 +367,5 @@ void drawAnimationLEDMatrix(MeLEDMatrix *meLEDMatrix, std::list<std::vector<uint
         delay(tmp);
     }
 }
+#endif // MeMCore_H
+
