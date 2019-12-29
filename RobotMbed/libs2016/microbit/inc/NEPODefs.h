@@ -114,6 +114,15 @@ void _removeListElementByIndex(std::list<T> &list, unsigned index) {
  * then the match void setListElementByIndex(std::list<double>, int, int) would not be possible
  */
 
+template<typename T>
+std::list<T> &_createListRepeat(unsigned count, T e) {
+    std::list<T> &l = *(new std::list<T>);
+    for (unsigned i = 0; i < count; i++) {
+        l.push_back(e);
+    }
+    return l;
+}
+
 template<typename T, typename P>
 void _setListElementByIndex(std::list<T> &list, unsigned index, P value) {
     if (index < list.size()) {
