@@ -272,18 +272,12 @@ void assertNepo(bool test, String text, T left, String op, U right) {
     }
 }
 
-
 #ifdef MeMCore_H
-std::vector<uint8_t> invertLEDMatrixVec(std::vector<uint8_t> &arr) { 
+std::vector<uint8_t> invertLEDMatrixVec(std::vector<uint8_t> arr) { 
     for (uint8_t i = 0; i < 16; i++) { 
         arr[i]=~(byte)arr[i];
     }  
     return arr;
-}
-
-std::vector<uint8_t> invertLEDMatrixArr(uint8_t *arr) {
-    std::vector<uint8_t> myvec(arr, arr + 16);
-    return invertLEDMatrixVec(myvec);
 }
 
 std::vector<uint8_t> shiftLEDMatrixRightVec(std::vector<uint8_t> arr, int shift) {
@@ -295,10 +289,6 @@ std::vector<uint8_t> shiftLEDMatrixRightVec(std::vector<uint8_t> arr, int shift)
         arr.insert(arr.end(), -shift, 0);
     }
     return arr;
-}
-std::vector<uint8_t> shiftLEDMatrixRightArr( uint8_t arr[16], int shift) {
-    std::vector<uint8_t> myvec(arr, arr + 16);
-    return shiftLEDMatrixRightVec(myvec, shift);
 }
 
 std::vector<uint8_t> shiftLEDMatrixLeftVec(std::vector<uint8_t> arr, int shift) {
@@ -328,10 +318,6 @@ std::vector<uint8_t> shiftLEDMatrixUpVec(std::vector<uint8_t> arr, int shift) {
     }
     return arr;
 }
-std::vector<uint8_t> shiftLEDMatrixUpArr(uint8_t arr[16], int shift) {
-    std::vector<uint8_t> myvec(arr, arr + 16);
-    return shiftLEDMatrixUpVec(myvec, shift);
-}
 
 std::vector<uint8_t> shiftLEDMatrixDownVec(std::vector<uint8_t> arr, int shift) {
     if (shift < 0) {
@@ -344,11 +330,6 @@ std::vector<uint8_t> shiftLEDMatrixDownVec(std::vector<uint8_t> arr, int shift) 
         } 
     }
     return arr;
-}
-
-std::vector<uint8_t> shiftLEDMatrixDownArr( uint8_t arr[16], int shift) {
-    std::vector<uint8_t> myvec(arr, arr + 16);
-    return shiftLEDMatrixDownVec(myvec, shift);
 }
 
 void drawStrLEDMatrix(MeLEDMatrix *meLEDMatrix, const String &str, int tmp ) {
