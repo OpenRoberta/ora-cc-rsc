@@ -102,7 +102,7 @@ void SteerDriveEx(unsigned char portLeft, unsigned char portRight, float powerLe
     float absPowerLeft = abs(powerLeft);
     float absPowerRight = abs(powerRight);
     if (powerLeft == powerRight) {
-        long angle = distance * 360.0 / (PI * WHEELDIAMETER);
+        long angle = distance * 360.0 / (M_PI * WHEELDIAMETER);
         RotateMotorEx(ports, powerLeft, angle, 0, true, true);
         Wait(1);
         return;
@@ -115,7 +115,7 @@ void SteerDriveEx(unsigned char portLeft, unsigned char portRight, float powerLe
     } else {
         outerCircumference = powerRight / (powerRight + powerLeft) * 2.0 * distance;
     }
-    long angle = abs(outerCircumference * 360.0 / (PI * WHEELDIAMETER));
+    long angle = abs(outerCircumference * 360.0 / (M_PI * WHEELDIAMETER));
     if (absPowerLeft < absPowerRight) {
         OnFwdRegEx(portLeft, powerLeft, OUT_REGMODE_SPEED, RESET_ALL);
         OnFwdRegEx(portRight, powerRight, OUT_REGMODE_SPEED, RESET_ALL);

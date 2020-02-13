@@ -7,6 +7,14 @@
 #include <utils.h>
 #include <stdlib.h>
 
+#ifndef M_GOLDEN_RATIO
+#define M_GOLDEN_RATIO 1.61803398875
+#endif
+
+#ifndef M_INFINITY
+#define M_INFINITY 0x7f800000
+#endif
+
 #ifndef _CLAMP
 #define _CLAMP(x, lower, upper) (( (x) > (upper) ) ? (upper) : ( (x) < (lower) ? (lower) : (x) ))
 #endif
