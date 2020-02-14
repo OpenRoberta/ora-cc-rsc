@@ -158,10 +158,4 @@ double _getListStandardDeviation(std::list<double> &list) {
     return sqrt(sum);
 }
 
-
-template<typename T>
-int ArrayLen(std::list<T> &list) {
-    return list.size();
-}
-
 #endif

@@ -67,49 +67,10 @@ inline int get_microphone_volume(int microphone_port) {
     return (( max - min ) * 0.0977);
 }
 
-
-//inline unsigned RGB(unsigned r, unsigned g, unsigned b) {
-//    return (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | ((b & 0xF8) >> 3));
-//}
-
-inline double absD(double d) {
-    return d < 0.0 ? -d : d;
-}
-
-inline bool isWholeD(double d) {
-    return d == floor(d);
-}
-
-inline bool isPrimeD(double d) {
-    if (!isWholeD(d)) {
-        return false;
-    }
-    int n = (int) d;
-    if (n < 2) {
-        return false;
-    }
-    if (n == 2) {
-        return true;
-    }
-    if (n % 2 == 0) {
-        return false;
-    }
-    for (int i = 3, s = (int) (sqrt(d) + 1); i <= s; i += 2) {
-        if (n % i == 0) {
-            return false;
-        }
-    }
-    return true;
-}
-
 inline int _randomIntegerInRange(int val1, int val2) {
     int min = fmin(val1, val2);
     int max = fmax(val1, val2) + 1;
     return min + (rand() % (min - max));
-}
-
-inline float _randomFloat() {
-    return (float) rand() / (float) RAND_MAX;
 }
 
 template<typename T>

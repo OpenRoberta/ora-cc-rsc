@@ -42,59 +42,27 @@
 #define _CB_21_ADDR (0x21 << 1)
 #endif
 
-#define assertNepo(test, msg, left, op, right) ({ \
-    if (test == false) { \
-        ManagedString _assertMsg = ManagedString("Assertion failed: ") + ManagedString(msg) \
-        + ManagedString(" ") + ManagedString(left) + ManagedString(" ") + ManagedString(op) \
-        + ManagedString(" ") + ManagedString(right) + ManagedString("\r\n"); \
-        _uBit.serial.setTxBufferSize(_assertMsg.length()); \
-        _uBit.serial.send(_assertMsg); \
-        _uBit.sleep(_ITERATION_SLEEP_TIMEOUT); \
-    } \
+#define assertNepo(test, msg, left, op, right) ({                                                                                                                                                                                                    \
+    if (test == false) {                                                                                                                                                                                                                             \
+        ManagedString _assertMsg = ManagedString("Assertion failed: ") + ManagedString(msg) + ManagedString(" ") + ManagedString(left) + ManagedString(" ") + ManagedString(op) + ManagedString(" ") + ManagedString(right) + ManagedString("\r\n"); \
+        _uBit.serial.setTxBufferSize(_assertMsg.length());                                                                                                                                                                                           \
+        _uBit.serial.send(_assertMsg);                                                                                                                                                                                                               \
+        _uBit.sleep(_ITERATION_SLEEP_TIMEOUT);                                                                                                                                                                                                       \
+    }                                                                                                                                                                                                                                                \
 })
 
-#include <list>
-#include <array>
 #include <limits.h>
+#include <array>
+#include <list>
 
-inline double absD(double d) {
-    return d < 0.0 ? -d : d;
-}
-
-inline bool isWholeD(double d) {
-    return d == floor(d);
-}
-
-inline bool isPrimeD(double d) {
-    if (!isWholeD(d)) {
-        return false;
-    }
-    int n = (int) d;
-    if (n < 2) {
-        return false;
-    }
-    if (n == 2) {
-        return true;
-    }
-    if (n % 2 == 0) {
-        return false;
-    }
-    for (int i = 3, s = (int) (sqrt(d) + 1); i <= s; i += 2) {
-        if (n % i == 0) {
-            return false;
-        }
-    }
-    return true;
-}
-
-template<typename T>
+template <typename T>
 T _getListElementByIndex(std::list<T> &list, unsigned index) {
     auto iterator = list.begin();
     advance(iterator, index);
     return (*iterator);
 }
 
-template<typename T>
+template <typename T>
 T _getAndRemoveListElementByIndex(std::list<T> &list, unsigned index) {
     auto iterator = list.begin();
     advance(iterator, index);
@@ -103,7 +71,7 @@ T _getAndRemoveListElementByIndex(std::list<T> &list, unsigned index) {
     return value;
 }
 
-template<typename T>
+template <typename T>
 void _removeListElementByIndex(std::list<T> &list, unsigned index) {
     _getAndRemoveListElementByIndex(list, index);
 }
@@ -114,7 +82,7 @@ void _removeListElementByIndex(std::list<T> &list, unsigned index) {
  * then the match void setListElementByIndex(std::list<double>, int, int) would not be possible
  */
 
-template<typename T>
+template <typename T>
 std::list<T> &_createListRepeat(unsigned count, T e) {
     std::list<T> &l = *(new std::list<T>);
     for (unsigned i = 0; i < count; i++) {
@@ -123,52 +91,52 @@ std::list<T> &_createListRepeat(unsigned count, T e) {
     return l;
 }
 
-template<typename T, typename P>
+template <typename T, typename P>
 void _setListElementByIndex(std::list<T> &list, unsigned index, P value) {
     if (index < list.size()) {
         auto iterator = list.begin();
         advance(iterator, index);
-        (*iterator) = (T) (value);
+        (*iterator) = (T)(value);
     } else {
-        list.push_back((T) (value));
+        list.push_back((T)(value));
     }
 }
 
-template<typename T, typename P>
+template <typename T, typename P>
 void _insertListElementBeforeIndex(std::list<T> &list, unsigned index,
-        P value) {
+                                   P value) {
     auto iterator = list.begin();
     advance(iterator, index);
-    list.insert(iterator, (T) (value));
+    list.insert(iterator, (T)(value));
 }
 
-template<typename T, typename P>
+template <typename T, typename P>
 int _getFirstOccuranceOfElement(std::list<T> &list, P value) {
     int i = 0;
     auto iterator = list.begin();
     for (i = 0, iterator = list.begin(); iterator != list.end();
-            ++iterator, ++i) {
-        if ((P) (*iterator) == value) {
+         ++iterator, ++i) {
+        if ((P)(*iterator) == value) {
             return i;
         }
     }
     return -1;
 }
 
-template<typename T, typename P>
+template <typename T, typename P>
 int _getLastOccuranceOfElement(std::list<T> &list, P value) {
     int i = 0;
     auto iterator = list.rbegin();
     for (i = 0, iterator = list.rbegin(); iterator != list.rend();
-            ++iterator, ++i) {
-        if ((P) (*iterator) == value) {
+         ++iterator, ++i) {
+        if ((P)(*iterator) == value) {
             return list.size() - i - 1;
         }
     }
     return -1;
 }
 
-template<typename T>
+template <typename T>
 std::list<T> &_getSubList(std::list<T> &list, int startIndex, int endIndex) {
     auto beginIterator = list.begin();
     advance(beginIterator, startIndex);
@@ -237,25 +205,25 @@ double _getListStandardDeviation(std::list<double> &list) {
     return sqrt(sum);
 }
 
-template<typename T, long unsigned S>
+template <typename T, long unsigned S>
 std::array<T, S> _convertToArray(std::list<T> &list) {
     auto iterator = list.begin();
     std::array<T, S> result;
     int i = 0;
     for (auto iterator = list.begin(), i = 0; iterator != list.end();
-            ++iterator, ++i) {
+         ++iterator, ++i) {
         result[i] = *iterator;
     }
     return result;
 }
 
-template<typename T, long unsigned S>
+template <typename T, long unsigned S>
 std::array<T, S> _convertToArray(std::initializer_list<T> list) {
     auto iterator = list.begin();
     std::array<T, S> result;
     int i = 0;
     for (auto iterator = list.begin(), i = 0; iterator != list.end();
-            ++iterator, ++i) {
+         ++iterator, ++i) {
         result[i] = *iterator;
     }
     return result;
@@ -296,11 +264,7 @@ int _getDistance(MicroBitColor current, MicroBitColor match) {
 }
 
 uint8_t _findNearestColor(MicroBitColor current) {
-    MicroBitColor map[] = { MicroBitColor(0, 0, 0, 255), MicroBitColor(0, 153,
-            0, 255), MicroBitColor(255, 0, 0, 255), MicroBitColor(255, 255, 102,
-            255), MicroBitColor(51, 102, 255, 255), MicroBitColor(0, 204, 204,
-            255), MicroBitColor(102, 0, 204, 255), MicroBitColor(255, 255, 255,
-            255) };
+    MicroBitColor map[] = {MicroBitColor(0, 0, 0, 255), MicroBitColor(0, 153, 0, 255), MicroBitColor(255, 0, 0, 255), MicroBitColor(255, 255, 102, 255), MicroBitColor(51, 102, 255, 255), MicroBitColor(0, 204, 204, 255), MicroBitColor(102, 0, 204, 255), MicroBitColor(255, 255, 255, 255)};
     int shortestDistance = INT_MAX;
     uint8_t index = -1;
 
@@ -319,11 +283,11 @@ uint8_t _findNearestColor(MicroBitColor current) {
     return index;
 }
 void _cbSetRGBLed(char buf[5], MicroBitI2C *i2c, uint8_t port,
-        uint8_t colorIndex) {
+                  uint8_t colorIndex) {
     uint8_t length = 2;
     uint8_t color = 0x80 | colorIndex;
     bool allLeds = false;
-    if (port == 5) { // all leds
+    if (port == 5) {  // all leds
         length = 5;
         port = 1;
         buf[2] = color;
@@ -336,12 +300,12 @@ void _cbSetRGBLed(char buf[5], MicroBitI2C *i2c, uint8_t port,
 }
 
 void _cbSetRGBLed(char buf[5], MicroBitI2C *i2c, uint8_t port,
-        MicroBitColor color) {
+                  MicroBitColor color) {
     _cbSetRGBLed(buf, i2c, port, _findNearestColor(color));
 }
 
 void _cbSetLed(char buf[5], MicroBitI2C *i2c, uint8_t &ledState, uint8_t port,
-        bool on) {
+               bool on) {
     buf[0] = 0;
     if (on) {
         ledState |= port;
@@ -353,7 +317,7 @@ void _cbSetLed(char buf[5], MicroBitI2C *i2c, uint8_t &ledState, uint8_t port,
 }
 
 void _cbSetMotors(char buf[5], MicroBitI2C *i2c, int speedLeft,
-        int speedRight) {
+                  int speedRight) {
     buf[0] = 0;
     if (speedLeft < 0) {
         speedLeft *= -1;
@@ -403,7 +367,5 @@ bool _cbGetSampleInfrared(char buf[5], MicroBitI2C *i2c, uint8_t sensor) {
 }
 
 ManagedString _castColorToString(MicroBitColor color) {
-    return (ManagedString("RGBW(") + color.getRed() + ManagedString(", ")
-            + color.getGreen() + ManagedString(", ") + color.getBlue()
-            + ManagedString(", ") + color.getWhite() + ManagedString(")"));
+    return (ManagedString("RGBW(") + color.getRed() + ManagedString(", ") + color.getGreen() + ManagedString(", ") + color.getBlue() + ManagedString(", ") + color.getWhite() + ManagedString(")"));
 }
