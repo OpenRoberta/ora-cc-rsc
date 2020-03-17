@@ -147,6 +147,9 @@ uint16_t randomBits(uint8_t zeros, uint8_t ones);
 
 uint32_t random32();
 
+void timer_init();
+
+unsigned long millis(void);
 
 static inline 
 uint8_t random8() {
