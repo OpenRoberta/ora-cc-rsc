@@ -1,9 +1,0 @@
-usbasp.name=NIBObee & burger programmer (usbasp)
-usbasp.protocol=usbasp
-usbasp.communication=usb
-usbasp.program.extra_params=-Pusb
-
-avrisp.name=UCOM-IR2 / UCOM-IR2-X (stk500v2)
-avrisp.communication=serial
-avrisp.protocol=stk500v2
-avrisp.program.extra_params=-P{serial.port}
