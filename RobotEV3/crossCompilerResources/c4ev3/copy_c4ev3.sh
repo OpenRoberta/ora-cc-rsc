@@ -5,6 +5,7 @@ then
     echo "Wrong number of arguments"
     echo "copy_c4ev3.sh <c4ev3 path> <gcc glibc prefix> <gcc uclibc prefix>"
     echo "example: ./copy_c4ev3.sh ../EV3-API arm-linux-gnueabi- arm-c4ev3-linux-uclibceabi-"
+    echo "Read the README file in the folder containing this script for more information."
     exit
 fi
 
@@ -30,14 +31,16 @@ function safe_cp {
 }
 
 function copy_headers {
-	safe_cp $C4EV3_PATH/src/*.h "$SCRIPTPATH/include/c4ev3"
-	safe_cp $C4EV3_PATH/src/ev3_sensors/*.h "$SCRIPTPATH/include/c4ev3/ev3_sensors"
+	safe_cp $C4EV3_PATH/include/*.h "$SCRIPTPATH/include/c4ev3"
+	safe_cp $C4EV3_PATH/include/ev3_sensors/*.h "$SCRIPTPATH/include/c4ev3/ev3_sensors"
+	# we need the 'private' definition of the 'SensorHandler' struct (included in NEPOLog.h)
+	safe_cp $C4EV3_PATH/API/sensors/ev3_sensors.h "$SCRIPTPATH/include/c4ev3/ev3_sensors/ev3_sensors.private.h"
 }
 
 function build_static_library {
 	cd "$C4EV3_PATH"
 	make clean > /dev/null
-	CROSS_COMPILE="$1" make > /dev/null
+	CROSS_COMPILE="$1" make
 	result=$?
 	if [[ $result -ne 0 ]]; then
 		echo "Error while compiling c4ev3 using the cross compiler prefix $1. Exit code: $result"

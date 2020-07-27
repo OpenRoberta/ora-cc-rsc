@@ -1,6 +1,8 @@
 #ifndef NEPOLOG
 #define NEPOLOG
 
+#include "ev3_sensors/ev3_sensors.private.h"
+
 #define LOG_DELAY 2000
 
 void * loggingLoop (void * arguments);
@@ -73,20 +75,20 @@ std::string readEV3TouchSensorAsString (int port) {
 }
 
 std::string readEV3GyroSensorAsString (int port) {
-    return "angle: " + ToString(ReadEV3GyroSensor(port, EV3GyroAngle)) +
-        " rate: " + ToString(ReadEV3GyroSensor(port, EV3GyroRate));
+    return "angle: " + ToString(ReadEV3GyroSensorAngle(port, EV3GyroInterleavedAngle)) +
+        " rate: " + ToString(ReadEV3GyroSensorRate(port, EV3GyroInterleavedRate));
 }
 
 std::string readEV3ColorSensorAsString (int port) {
     int mode = EV3Color->currentSensorMode[port];
     switch (mode) {
         case EV3_COLOR_SENSOR_REFLECT_MODE:
-            return ToString(ReadEV3ColorSensorLight(port, ReflectedLight));
+            return ToString(ReadEV3ColorSensorReflectedLight(port));
         case EV3_COLOR_SENSOR_AMBIENT_MODE:
-            return ToString(ReadEV3ColorSensorLight(port, AmbientLight));
+            return ToString(ReadEV3ColorSensorAmbientLight(port));
         case EV3_COLOR_SENSOR_COLOR_MODE:
-            return ToString(ReadEV3ColorSensor(port));
-        case EV3_COLOR_SENSOR_RGB_MODE:
+            return ToString(ReadEV3ColorSensorColor(port));
+        case EV3_COLOR_SENSOR_RAW_COLOR_MODE:
             return ToString(NEPOReadEV3ColorSensorRGB(port));
         default:
             return "???";   
@@ -110,7 +112,7 @@ std::string readEV3UltrasonicSensorAsString (int port) {
     int mode = EV3Ultrasonic->currentSensorMode[port];
     switch (mode) {
         case EV3_ULTRASONIC_SENSOR_DISTANCE_MM_MODE:
-            return ToString(ReadEV3UltrasonicSensorDistance(port, CM));
+            return ToString(ReadEV3UltrasonicSensorDistance(port, EV3_ULTRASONIC_CM));
         case EV3_ULTRASONIC_SENSOR_LISTEN_MODE:
             return ToString(ReadEV3UltrasonicSensorListen(port));
         default:
@@ -125,12 +127,12 @@ std::string readHTCompassSensorAsString (int port) {
 }
 
 std::string readHTIrSensorAsString (int port) {
-    int mode = HTIr->currentSensorMode[port];
-    return ToString(ReadHTIrSensor(port, (HTIrReadingMode) mode));
+    int mode = HTIrV2->currentSensorMode[port];
+    return ToString(ReadHTIrV2Sensor(port, (HTIrV2ReadingMode) mode));
 }
 
 std::string readNXTSoundSensorAsString (int port) {
-    return ToString(ReadNXTSoundSensor(port, DB));
+    return ToString(ReadNXTSoundSensor(port, NXT_SOUND_DB));
 }
 
 std::string readHTColorSensorV2AsString (int port) {
@@ -160,7 +162,7 @@ std::string readSensorAsString (int port, SensorHandler * sensor) {
         return readEV3UltrasonicSensorAsString(port);
     } else if (sensor == HTCompass) {
         return readHTCompassSensorAsString(port);
-    } else if (sensor == HTIr) {
+    } else if (sensor == HTIrV2) {
         return readHTIrSensorAsString(port);
     } else if (sensor == NXTSound) {
         return readNXTSoundSensorAsString(port);

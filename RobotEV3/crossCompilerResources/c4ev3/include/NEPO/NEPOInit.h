@@ -25,11 +25,11 @@ void inline NEPOInitEV3 () {
         onNEPOProgramJustUploaded();
     }        
     startThreadToMonitorEscapeSequence();
-    SetLedPattern(LED_GREEN_PULSE);
+    SetLedPattern(LEDPattern_PulsingGreen);
 }
 
 void inline NEPOFreeEV3 () {
-    SetLedPattern(LED_GREEN);
+    SetLedPattern(LEDPattern_SteadyGreen);
     FreeEV3();
     exit(0);
 }
@@ -93,11 +93,11 @@ void * escapeSequenceMonitor (void * arguments) {
 }
 
 bool isEscapeSequence () {
-    return ButtonIsDown(BTNCENTER) && ButtonIsDown(BTNDOWN);
+    return ButtonIsDown(Button_Enter) && ButtonIsDown(Button_Down);
 }
 
 void NEPOError (std::string error, std::string message) {
-    SetLedPattern(LED_RED);
+    SetLedPattern(LEDPattern_SteadyRed);
     LcdClean();
     DrawString("ERROR", 8, 2);
     DrawString(error.c_str(), 10 - (error.length() / 2), 4);

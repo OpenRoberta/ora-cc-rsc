@@ -5,15 +5,18 @@
  *
  * License:
  *
- * The contents of this file are subject to the Mozilla Public License
- * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/
  *
  * The Initial Developer of this code is John Hansen.
  * Portions created by John Hansen are Copyright (C) 2009-2013 John Hansen.
@@ -43,7 +46,7 @@ extern "C" {
 #include <stdbool.h>
 #include <limits.h>
 
-#include "ev3_wait.h"
+#include "ev3_command.h"
 #include "ev3_constants.h"
 
 bool OutputInit(void);
@@ -164,9 +167,7 @@ void Rev(uint8_t Outputs);
 
 void OnFwdEx(uint8_t Outputs, int8_t Power, uint8_t reset);
 
-void inline OnRevEx(uint8_t Outputs, int8_t Power, uint8_t reset) {
-    OnFwdEx(Outputs, -Power, reset);
-}
+void OnRevEx(uint8_t Outputs, int8_t Power, uint8_t reset);
 
 #define OnFwd(_outputs) OnFwdEx((_outputs), OUT_POWER_DEFAULT, RESET_NONE)
 
@@ -174,9 +175,7 @@ void inline OnRevEx(uint8_t Outputs, int8_t Power, uint8_t reset) {
 
 void OnFwdRegEx(uint8_t Outputs, int8_t Speed, uint8_t RegMode, uint8_t reset);
 
-void inline OnRevRegEx(uint8_t Outputs, int8_t Speed, uint8_t RegMode, uint8_t reset) {
-    OnFwdRegEx(Outputs, -Speed, RegMode, reset);
-}
+void OnRevRegEx(uint8_t Outputs, int8_t Speed, uint8_t RegMode, uint8_t reset);
 
 #define OnFwdReg(_outputs, _speed) OnFwdRegEx((_outputs), (_speed), OUT_REGMODE_SPEED, RESET_NONE)
 
@@ -184,9 +183,7 @@ void inline OnRevRegEx(uint8_t Outputs, int8_t Speed, uint8_t RegMode, uint8_t r
 
 void OnFwdSyncEx(uint8_t Outputs, int8_t Speed, short Turn, uint8_t reset);
 
-void inline OnRevSyncEx(uint8_t Outputs, int8_t Speed, short Turn, uint8_t reset) {
-    OnFwdSyncEx(Outputs, -Speed, Turn, reset);
-}
+void OnRevSyncEx(uint8_t Outputs, int8_t Speed, short Turn, uint8_t reset);
 
 #define OnFwdSync(_outputs, _speed) OnFwdSyncEx((_outputs), (_speed), 0, RESET_NONE)
 
@@ -199,6 +196,10 @@ void RotateMotorNoWaitEx(uint8_t Outputs, int8_t Speed, int Angle, short Turn, b
 void RotateMotorEx(uint8_t Outputs, int8_t Speed, int Angle, short Turn, bool Sync, bool Stop);
 
 #define RotateMotor(_outputs, _speed, _angle) RotateMotorEx((_outputs), (_speed), (_angle), 0, true, true)
+
+void RotateMotorRampNoWait(uint8_t Outputs, int8_t Speed, int accelAngle, int steadyAngle, int decelAngle, bool Stop);
+
+void RotateMotorRamp      (uint8_t Outputs, int8_t Speed, int accelAngle, int steadyAngle, int decelAngle, bool Stop);
 
 void OnForSyncEx(uint8_t Outputs, int Time, int8_t Speed, short Turn, bool Stop);
 

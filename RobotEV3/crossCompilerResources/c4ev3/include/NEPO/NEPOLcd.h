@@ -12,14 +12,14 @@ void SetCursorColumn (int column) {
     if (column < 0) {
         column = 0;
     }
-    SetCursorX(column * DEFAULT_FONT_CHARACTER_WIDTH);
+    LcdSetCursorX(column * DEFAULT_FONT_CHARACTER_WIDTH);
 }
 
 void SetCursorRow (int row) {
     if (row < 0) {
         row = 0;
     }
-    SetCursorY(row * DEFAULT_FONT_CHARACTER_HEIGHT);
+    LcdSetCursorY(row * DEFAULT_FONT_CHARACTER_HEIGHT);
 }
 
 void DrawString (std::string str, int column, int row) {

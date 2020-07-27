@@ -5,15 +5,18 @@
  *
  * License:
  *
- * The contents of this file are subject to the Mozilla Public License
- * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/
  *
  * The Initial Developer of this code is Simón Rodriguez Perez.
  * Portions created by Simón Rodriguez Perez are Copyright (C) 2014-2015 Simón Rodriguez Perez.
@@ -41,21 +44,41 @@ extern "C" {
 #include <stdbool.h>
 
 #include "ev3_constants.h"
-#include "ev3_timer.h"
-#include "ev3_wait.h"
+#include "ev3_command.h"
 #include "ev3_output.h"
 #include "ev3_sensors/ev3_sensors.h"
 #include "ev3_button.h"
 #include "ev3_lcd.h"
 #include "ev3_sound.h"
 #include "ev3_bluetooth.h"
+#include "ev3_array.h"
+#include "ev3_timer.h"
 
+// Priority of the InitEV3/FreeEV3 functions for automatic construction and destruction
+// see https://gcc.gnu.org/onlinedocs/gcc-4.3.3/gcc/Function-Attributes.html
+// see https://stackoverflow.com/a/24361145
+// - 0-100 is reserved for the compiler
+// - 101-200 is left for the user
+#define EV3_CONSTRUCTOR_PRIORITY 201
+#define EV3_DESTRUCTOR_PRIORITY 201
 
 int InitEV3(void);
 int FreeEV3(void);
 bool EV3IsInitialized(void);
 
+/*
+ *  Compatibility alias definitions
+*/
 
+/*!
+ * @deprecated
+*/
+#define CloseEV3() FreeEV3()
+
+/*!
+ * @deprecated
+*/
+#define ExitEV3() FreeEV3()
 
 /* Students are lazy, so lets have the intialization happen automatically for them.
  * This code is usually linked in as a static library and the linker will throw

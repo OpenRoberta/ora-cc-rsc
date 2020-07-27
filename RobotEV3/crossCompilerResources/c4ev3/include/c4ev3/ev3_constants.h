@@ -1,22 +1,25 @@
 /** \file ev3_constants.h
  * \brief Constants for various EV3 modules
  *
- * ev3_constants.h contains declarations for various EV3 C API functions.
+ * ev3_constants.h contains eclarations for various EV3 C API functions.
  *
  * License:
  *
- * The contents of this file are subject to the Mozilla Public License
- * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/
  *
  * The Initial Developer of this code is John Hansen.
- * Portions created by John Hansen are Copyright (C) 2009-2013 John Hansen.
+ * Portions  by John Hansen are Copyright (C) 2009-2013 John Hansen.
  * All Rights Reserved.
  *
  * ----------------------------------------------------------------------------
@@ -31,6 +34,13 @@
  * \date 2015-02-24
  * \version 2
  * Add: - Input port constants
+ *
+ * ----------------------------------------------------------------------------
+ *
+ * \author Jakub Vanek
+ * \date 2020-02-13
+ * \version 3
+ * \note added button enum values
  */
 
 #ifdef __cplusplus
@@ -199,20 +209,27 @@ extern "C" {
  * @{
  */
 // Button IDs
-#define BUTTON_ID_UP     0x01 //!< The up button.
-#define BUTTON_ID_ENTER  0x02 //!< The enter button.
-#define BUTTON_ID_DOWN   0x04 //!< The down button.
-#define BUTTON_ID_RIGHT  0x08 //!< The right button.
-#define BUTTON_ID_LEFT   0x10 //!< The left button.
-#define BUTTON_ID_ESCAPE 0x20 //!< The exit (escape) button.
-#define BUTTON_ID_ALL    0x3f //!< All buttons mask.
+#define BUTTON_IDX_UP     0u //!< The up button.
+#define BUTTON_IDX_ENTER  1u //!< The enter button.
+#define BUTTON_IDX_DOWN   2u //!< The down button.
+#define BUTTON_IDX_RIGHT  3u //!< The right button.
+#define BUTTON_IDX_LEFT   4u //!< The left button.
+#define BUTTON_IDX_ESCAPE 5u //!< The exit (escape) button.
 
-#define BTN1 BUTTON_ID_ESCAPE //!< The exit (escape) button.
-#define BTN2 BUTTON_ID_RIGHT  //!< The right button.
-#define BTN3 BUTTON_ID_LEFT   //!< The left button.
-#define BTN4 BUTTON_ID_ENTER  //!< The enter button.
-#define BTN5 BUTTON_ID_UP     //!< The up button.
-#define BTN6 BUTTON_ID_DOWN   //!< The down button.
+#define BUTTON_ID_UP     (1u << BUTTON_IDX_UP) //!< The up button.
+#define BUTTON_ID_ENTER  (1u << BUTTON_IDX_ENTER) //!< The enter button.
+#define BUTTON_ID_DOWN   (1u << BUTTON_IDX_DOWN) //!< The down button.
+#define BUTTON_ID_RIGHT  (1u << BUTTON_IDX_RIGHT) //!< The right button.
+#define BUTTON_ID_LEFT   (1u << BUTTON_IDX_LEFT) //!< The left button.
+#define BUTTON_ID_ESCAPE (1u << BUTTON_IDX_ESCAPE) //!< The exit (escape) button.
+#define BUTTON_ID_ALL    0x3fu //!< All buttons mask.
+
+#define BTN1 BUTTON_IDX_ESCAPE //!< The exit (escape) button.
+#define BTN2 BUTTON_IDX_RIGHT  //!< The right button.
+#define BTN3 BUTTON_IDX_LEFT   //!< The left button.
+#define BTN4 BUTTON_IDX_ENTER  //!< The enter button.
+#define BTN5 BUTTON_IDX_UP     //!< The up button.
+#define BTN6 BUTTON_IDX_DOWN   //!< The down button.
 
 #define BTNEXIT   BTN1 //!< The exit (escape) button.
 #define BTNRIGHT  BTN2 //!< The right button.
@@ -220,10 +237,30 @@ extern "C" {
 #define BTNCENTER BTN4 //!< The enter button.
 #define BTNUP     BTN5 //!< The up button.
 #define BTNDOWN   BTN6 //!< The down button.
-#define BTNANY    BUTTON_ID_ALL //!< Any button
 
 #define NO_OF_BTNS 6  //!< The number of EV3 buttons.
 #define NUM_BUTTONS 6 //!< Number of buttons in the system
+
+//! Button identifier for normal uses.
+typedef enum {
+	Button_Up     = BUTTON_IDX_UP, //!< The up button.
+	Button_Enter  = BUTTON_IDX_ENTER, //!< The enter button.
+	Button_Down   = BUTTON_IDX_DOWN, //!< The down button.
+	Button_Right  = BUTTON_IDX_RIGHT, //!< The right button.
+	Button_Left   = BUTTON_IDX_LEFT, //!< The left button.
+	Button_Escape = BUTTON_IDX_ESCAPE, //!< The exit (escape) button.
+} Button;
+
+//! Button bitmask for aggregating multiple buttons in one value
+typedef enum {
+	ButtonMask_Up     = BUTTON_ID_UP,     //!< The up button.
+	ButtonMask_Enter  = BUTTON_ID_ENTER,  //!< The enter button.
+	ButtonMask_Down   = BUTTON_ID_DOWN,   //!< The down button.
+	ButtonMask_Right  = BUTTON_ID_RIGHT,  //!< The right button.
+	ButtonMask_Left   = BUTTON_ID_LEFT,   //!< The left button.
+	ButtonMask_Escape = BUTTON_ID_ESCAPE, //!< The exit (escape) button.
+	ButtonMask_All    = BUTTON_ID_ALL,    //!< All buttons mask.
+} ButtonMask;
 
 /** @} */  // end of ButtonNameConstants group
 
@@ -233,12 +270,22 @@ extern "C" {
  * \sa ButtonState()
  * @{
  */
-#define BTNSTATE_PRESSED_EV         0x01 /*!< Button is in the pressed state. */
-#define BTNSTATE_SHORT_RELEASED_EV  0x02 /*!< Button is in the short released state. */
-#define BTNSTATE_LONG_PRESSED_EV    0x04 /*!< Button is in the long pressed state. */
-#define BTNSTATE_LONG_RELEASED_EV   0x08 /*!< Button is in the long released state. */
-#define BTNSTATE_PRESSED_STATE      0x80 /*!< A bitmask for the button pressed state */
-#define BTNSTATE_NONE               0x10 /*!< The default button state. */
+#define BTNSTATE_PRESSED_EV         0x01u /*!< Button is in the pressed state. */
+#define BTNSTATE_SHORT_RELEASED_EV  0x02u /*!< Button is in the short released state. */
+#define BTNSTATE_LONG_PRESSED_EV    0x04u /*!< Button is in the long pressed state. */
+#define BTNSTATE_LONG_RELEASED_EV   0x08u /*!< Button is in the long released state. */
+#define BTNSTATE_PRESSED_STATE      0x80u /*!< A bitmask for the button pressed state */
+#define BTNSTATE_NONE               0x10u /*!< The default button state. */
+
+typedef enum {
+	ButtonStates_PressEvent        = BTNSTATE_PRESSED_EV, /*!< Button is in the pressed state. */
+	ButtonStates_ShortReleaseEvent = BTNSTATE_SHORT_RELEASED_EV, /*!< Button is in the short released state. */
+	ButtonStates_LongPressEvent    = BTNSTATE_LONG_PRESSED_EV, /*!< Button is in the long pressed state. */
+	ButtonStates_LongReleaseEvent  = BTNSTATE_LONG_RELEASED_EV, /*!< Button is in the long released state. */
+	ButtonStates_PressedState      = BTNSTATE_PRESSED_STATE, /*!< A bitmask for the button pressed state */
+	ButtonStates_ReleasedState     = BTNSTATE_NONE, /*!< The default button state. */
+} ButtonStates;
+
 /** @} */  // end of ButtonStateConstants group
 
 /** @} */  // end of ButtonModuleConstants group
@@ -344,6 +391,18 @@ extern "C" {
 #define LED_ORANGE_PULSE 9  //!< LED orange pulse pattern
 #define NUM_LED_PATTERNS 10 //!< The number of LED patterns
 
+typedef enum {
+	LEDPattern_Off            = LED_BLACK, //!< LED black pattern
+	LEDPattern_SteadyGreen    = LED_GREEN, //!< LED green pattern
+	LEDPattern_SteadyRed      = LED_RED,  //!< LED red pattern
+	LEDPattern_SteadyOrange   = LED_ORANGE,  //!< LED orange pattern
+	LEDPattern_FlashingGreen  = LED_GREEN_FLASH,  //!< LED green flash pattern
+	LEDPattern_FlashingRed    = LED_RED_FLASH,  //!< LED red flash pattern
+	LEDPattern_FlashingOrange = LED_ORANGE_FLASH,  //!< LED orange flash pattern
+	LEDPattern_PulsingGreen   = LED_GREEN_PULSE,  //!< LED green pulse pattern
+	LEDPattern_PulsingRed     = LED_RED_PULSE,  //!< LED red pulse pattern
+	LEDPattern_PulsingOrange  = LED_ORANGE_PULSE,  //!< LED orange pulse pattern
+} LEDPattern;
 
 /** @addtogroup CommandModuleConstants
  * @{

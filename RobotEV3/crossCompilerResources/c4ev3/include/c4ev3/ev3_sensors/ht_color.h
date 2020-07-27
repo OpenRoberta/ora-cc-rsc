@@ -1,7 +1,19 @@
-#ifndef EV3_API_HT_COLOR_H
-#define EV3_API_HT_COLOR_H
+#ifndef HT_COLOR_H
+#define HT_COLOR_H
 
 #include "ev3_sensors.h"
+
+#define HT_COLOR_SENSOR_V2_IIC_ADDRESS         0x01
+
+#define HT_COLOR_SENSOR_V2_50HZ_MODE           0x35
+#define HT_COLOR_SENSOR_V2_60HZ_MODE           0x36
+
+#define HT_COLOR_SENSOR_V2_MODE_REGISTER       0x41
+#define HT_COLOR_SENSOR_V2_COLOR_REGISTER      0x42
+#define HT_COLOR_SENSOR_V2_R_1BYTE_REGISTER    0x43
+#define HT_COLOR_SENSOR_V2_G_1BYTE_REGISTER    0x44
+#define HT_COLOR_SENSOR_V2_B_1BYTE_REGISTER    0x45
+#define HT_COLOR_SENSOR_V2_W_1BYTE_REGISTER    0x46
 
 #define HT_COLOR_SENSOR_V2_DEFAULT_MODE        0
 #define HT_COLOR_SENSOR_V2_PASSIVE_MODE        1
@@ -27,32 +39,24 @@ typedef struct RGBA {
     int white;
 } RGBA;
 
-bool initHTColorSensorV2(int port);
-
-/**
- * @param port
- * @return HiTechnic color id (from 0 top 17, mapping on HiTechnic website)
- */
 int ReadHTColorSensorV2(int port);
 
 /**
- * With default reading mode (HTColorSensorDefaultMode) the values range from 0 to 1023.
- * With passive (HTColorSensorPassiveMode) and raw (HTColorSensorRawMode), the values range from 0 to 65535.
- * @param port
- * @return
+ * Read RGBA values. Each value ranges from 0 to 1023
+ * @param port port to which the sensor is connected
+ * @param mode HTColorV2ReadingMode
+ * @param result struct to which the result will be written  (output variable)
+ * @return -1 if there was an error
  */
-RGBA ReadHTColorSensorV2RGBA(int port, HTColorV2ReadingMode mode);
+int ReadHTColorSensorV2RGBA(int port, HTColorV2ReadingMode mode, RGBA* result);
 
+/**
+ * Prepare the sensor to read values in an environment where mains power uses the
+ * specified frequency
+ * @param port port to which the sensor is connected
+ * @param frequency frequency
+ */
 void SetHTColorV2PowerMainsFrequency(int port, HTColorV2PowerMainsFrequency frequency);
 
-void exitHTColorSensorV2();
-
-/* utility functions */
-int getHTColorSensorV2ModeFromReadingMode(HTColorV2ReadingMode readingMode);
-int getHTColorSensorV2ModeForMainsFrequency(HTColorV2PowerMainsFrequency frequency);
-void setHTColorSensorV2Mode(int port, int sensorMode);
-void writeToHTColorV2ModeRegister(int port, int value);
-RGBA readHTColorV2RGBA1ByteColor(int port);
-RGBA readHTColorV2RGBA2ByteColor(int port);
 
 #endif //EV3_API_HT_COLOR_H

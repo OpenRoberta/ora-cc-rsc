@@ -5,15 +5,18 @@
  *
  * License:
  *
- * The contents of this file are subject to the Mozilla Public License
- * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
  *
- * Software distributed under the License is distributed on an "AS IS"
- * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
- * License for the specific language governing rights and limitations
- * under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/
  *
  * The Initial Developer of this code is John Hansen.
  * Portions created by John Hansen are Copyright (C) 2009-2013 John Hansen.
@@ -27,7 +30,7 @@
  *
  * ----------------------------------------------------------------------------
  *
- * \author Ahmand Fatoum & Simón Rodriguez Perez(Hochschule Aschaffenburg)
+ * \author Ahmad Fatoum & Simón Rodriguez Perez(Hochschule Aschaffenburg)
  * \date 2015-02-28
  * \version 2
  * \note printf function added
@@ -63,6 +66,9 @@ extern "C" {
 
 #define LCD_BYTE_WIDTH ((LCD_WIDTH + 7) / 8)
 #define LCD_BUFFER_SIZE (LCD_BYTE_WIDTH * LCD_HEIGHT)
+
+#define LCD_COLOR_BLACK 1
+#define LCD_COLOR_WHITE 0
 
 typedef uint8_t  IMGDATA;    //!< Image base type
 typedef IMGDATA* IP;         //!< Instruction pointer type
@@ -136,10 +142,26 @@ bool LcdText(char Color, short X, short Y, char* Text);
 bool LcdIcon(char Color, short X, short Y, char IconType, char IconNum);
 bool LcdBmpFile(char Color, short X, short Y, char* Name);
 bool LcdPicture(char Color, short X, short Y, IP pBitmap);
+bool LcdSplash(char Color, short X, short Y, short W, short H, uint8_t *pXbmData);
 bool LcdFillWindow(char Color, short Y, short Y1);
 uint8_t* LcdGetFrameBuffer();
 void LcdWriteDisplayToFile(char* filename, ImageFormat fmt);
 void LcdWriteFrameBufferToFile(char* filename, ImageFormat fmt);
+
+/**
+ * To draw a loading splash:
+ *  1) Create a splash picture and save it as a .xbm file.
+ *     Please note that the image width must be a multiple of eight.
+ *  2) Include the XBM file:
+ *         #include "my_splash.xbm"
+ *  3) Create a new initialization function:
+ *         void __attribute__((constructor(101))) MyFancyInit (void)
+ *         {
+ *             LcdInit();
+ *             LcdSplash(1, 0, 0, my_splash_width, my_splash_height, my_splash_bits);
+ *         }
+ *     For this purpose, you can use priorities 101-200 (EV3_CONSTRUCTOR_PRIORITY - 1).
+ */
 
 /**
  * Draw a circle.
@@ -232,14 +254,8 @@ char RectOutEx(int x, int y, int width, int height, unsigned long options);
 char EllipseOutEx(int x, int y, uint8_t radiusX, uint8_t radiusY, unsigned long options);
 #define EllipseOut(_x, _y, _rx, _ry) EllipseOutEx((_x), (_y), (_rx), (_ry), DRAW_OPT_NORMAL)
 
-
 bool LcdTextf(char Color, short X, short Y, const char *fmt, ...);
-
-
-int LcdPrintf(char color, const char * fmt, ...);
-
-int LcdPrintln(char color, const char * fmt, ...);
-
+int LcdPrintf(char __color, const char * __fmt, ...);
 
 #ifdef __ASPRINTF
 #include <stdarg.h>
@@ -248,6 +264,10 @@ int vasprintf(char **, const char *, va_list)
 #endif
 
 
+/**
+ * Print formatted text on the display. Works like the normal printf.
+ * 
+ */
 int Ev3Printf(const char *fmt, ...);
 
 /**
@@ -274,16 +294,74 @@ int TermPrintf(const char *fmt, ...);
 int TermPrintln(const char *fmt, ...);
 
 /**
- * Set cursor position for TermPrint*, LcdPrint* and Ev3Print*
- * @param x
+ * \brief Set the X coordinate of the text cursor.
+ *
+ * This will overwrite the X (horizontal) pixel coordinate of the top left corner
+ * of the next character to be typed via Ev3Printf()/LcdPrintf()/... funtions.
+ *
+ * \param x Top left pixel X coordinate of the next character to be typed.
+ * \sa Ev3Printf(), Ev3Println(), Ev3Clear(), TermPrintf(), TermPrintln(), LcdPrintf()
+ * \sa LcdSetCursorY(), LcdGetCursorX(), LcdGetCursorY(), LcdResetCursor()
  */
-void SetCursorX(short x);
+void LcdSetCursorX(short x);
 
 /**
- * Set cursor position for TermPrint*, LcdPrint* and Ev3Print*
- * @param y
+ * \brief Set the Y coordinate of the text cursor.
+ *
+ * This will overwrite the Y (vertical) pixel coordinate of the top left corner
+ * of the next character to be typed via Ev3Printf()/LcdPrintf()/... funtions.
+ *
+ * \param y Top left pixel Y coordinate of the next character to be typed.
+ * \sa Ev3Printf(), Ev3Println(), Ev3Clear(), TermPrintf(), TermPrintln(), LcdPrintf()
+ * \sa LcdSetCursorX(), LcdGetCursorX(), LcdGetCursorY(), LcdResetCursor()
  */
-void SetCursorY(short y);
+void LcdSetCursorY(short y);
+
+/**
+ * \brief Get the X coordinate of the text cursor.
+ *
+ * This will acquire the X (horizontal) pixel coordinate of the top left corner
+ * of the next character to be typed via Ev3Printf()/LcdPrintf()/... funtions.
+ *
+ * \return Top left pixel X coordinate of the next character to be typed.
+ * \sa Ev3Printf(), Ev3Println(), Ev3Clear(), TermPrintf(), TermPrintln(), LcdPrintf()
+ * \sa LcdSetCursorX(), LcdSetCursorY(), LcdGetCursorY(), LcdResetCursor()
+ */
+short LcdGetCursorX(void);
+
+/**
+ * \brief Set the X coordinate of the text cursor.
+ *
+ * This will acquire the Y (vertical) pixel coordinate of the top left corner
+ * of the next character to be typed via Ev3Printf()/LcdPrintf()/... funtions.
+ *
+ * \return Top left pixel Y coordinate of the next character to be typed.
+ * \sa Ev3Printf(), Ev3Println(), Ev3Clear(), TermPrintf(), TermPrintln(), LcdPrintf()
+ * \sa LcdSetCursorX(), LcdSetCursorY(), LcdGetCursorX(), LcdResetCursor()
+ */
+short LcdGetCursorY(void);
+
+/**
+ * \brief Move the text cursor to the top left corner.
+ *
+ * This will set the cursor coordinates to (0, 0).
+ *
+ * \sa Ev3Printf(), Ev3Println(), Ev3Clear(), TermPrintf(), TermPrintln(), LcdPrintf()
+ * \sa LcdSetCursorX(), LcdSetCursorY(), LcdGetCursorX(), LcdGetCursorY()
+ */
+void LcdResetCursor(void);
+
+/**
+ * \brief Returns the y coordinate corresponding to the specified row
+ *
+ * Return the y coordinate corresponding to the specified row, according to the
+ * character height of the current font.
+ *
+ * \param row
+ * \return Y coordinate of the specified height
+ */
+short LcdRowToY(int row);
+
 
 #endif // ev3_lcd_h
 

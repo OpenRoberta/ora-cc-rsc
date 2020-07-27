@@ -8,13 +8,12 @@
 
 extern SensorHandler * EV3Touch;
 
-bool initEV3Touch(int port);
-
+/**
+ * Read the state of the touch sensor
+ * @param sensorPort port to which the sensor is connected
+ * @return true if pressed, false if not
+ */
 bool ReadEV3TouchSensor(int sensorPort);
 
-void exitEV3Touch(int port);
-
-/* Utility functions */
-void setEV3UltrasonicSensorMode(int port, int mode);
 
 #endif //EV3_API_EV3_TOUCH_SENSOR_H

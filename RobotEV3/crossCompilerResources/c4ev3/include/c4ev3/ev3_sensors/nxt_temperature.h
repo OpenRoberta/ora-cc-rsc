@@ -9,14 +9,10 @@
 extern SensorHandler * NXTTemperature;
 
 typedef enum NXTTemperatureUnit {
-    C,
-    F
+    NXT_TEMPERATURE_C,
+    NXT_TEMPERATURE_F
 } NXTTemperatureUnit;
 
-bool initNXTTemperatureSensor(int port);
-
 int ReadNXTTemperatureSensor(int port, NXTTemperatureUnit unit);
-
-void exitNXTTemperatureSensor(int port);
 
 #endif //EV3_API_NXT_TEMPERATURE_H

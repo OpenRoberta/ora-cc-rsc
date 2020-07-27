@@ -3,20 +3,19 @@
 
 #include "ev3_sensors.h"
 
-#define NXT_SOUND_SENSOR_DEFAULT_MODE 0
+#define NXT_SOUND_SENSOR_TYPE       3
+#define NXT_SOUND_SENSOR_DB_MODE    0
+#define NXT_SOUND_SENSOR_DBA_MODE   1
+
+#define NXT_SOUND_SENSOR_DEFAULT_MODE NXT_SOUND_SENSOR_DB_MODE
 
 extern SensorHandler * NXTSound;
 
-// TODO: Mode not implemented yet
 typedef enum NXTSoundReadingMode {
-    DB,
-    DBA
+    NXT_SOUND_DB,
+    NXT_SOUND_DBA
 } NXTSoundReadingMode;
 
-bool initNXTSoundSensor (int port);
-
 int ReadNXTSoundSensor(int port, NXTSoundReadingMode mode);
-
-void exitNXTSoundSensor(int port);
 
 #endif //EV3_API_NXT_SOUND_H

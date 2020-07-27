@@ -3,12 +3,13 @@
 
 
 #define BLUETOOTH_STRING_MESSAGE_MAX_LENGTH 128
+#define BLUETOOTH_CONNECTION_ATTEMPTS 10
 
 void NotifyBluetoothNameNotFoundError();
 
 BluetoothConnectionHandle NEPOConnectTo(std::string name) {
     NEPOInitEV3(); // connection may be assigned to a variable before main
-    BluetoothConnectionHandle handle = ConnectTo((char *) name.c_str());
+    BluetoothConnectionHandle handle = ConnectTo((char *) name.c_str(), BLUETOOTH_CONNECTION_ATTEMPTS);
     if (handle == -1) {
         NEPOError("Unknown bluetooth name", "Please pair the robots using the EV3 menu");
     }
