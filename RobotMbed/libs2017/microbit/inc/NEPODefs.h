@@ -481,3 +481,8 @@ void _TCS3472_init(char buf[8], MicroBitI2C *i2c, char it, char gain) {
 	_TCS3472_setGain(buf, i2c, gain);
 }
 
+void _cbSetServo(char buf[5], MicroBitI2C *i2c, char servo, int position) {
+    buf[0] = servo;
+    buf[1] = min(max(position, 0), 180);
+    i2c->write(_CB_20_ADDR, buf, 2);
+}
