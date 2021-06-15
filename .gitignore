@@ -4,4 +4,7 @@
 **/*.jar
 **/*.iml
 .idea/
+.project
+.settings
 RobotArdu/arduino-resources
+
