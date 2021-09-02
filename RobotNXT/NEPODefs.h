@@ -262,12 +262,11 @@ int SensorHtColor(int port, string mode) {
 int _readLightSensor(int port, int mode) {
     if (mode != _LIGHT_SENSOR_MODE) {
         if (mode == 1) {
-            SetSensorType(port, SENSOR_TYPE_LIGHT_ACTIVE);
+            SetSensorLight(port, true);
         } else if (mode == 2) {
-            SetSensorType(port, SENSOR_TYPE_LIGHT_INACTIVE);
+            SetSensorLight(port, false);
         }
         _LIGHT_SENSOR_MODE = mode;
-        ResetSensor(port);
     }
     return Sensor(port);
 }
