@@ -54,7 +54,7 @@ void DcMotor::release() {
     writeI2C(PCA9685_REGISTER_MODE1, 0x08);
 }
 
-void DcMotor::setPercent(Motor motor, int8_t speed) {
+void DcMotor::setPercent(double motor, double speed) {
     if (speed > 0) {
     	setPercent(motor, Direction::Forward, abs(speed));
 
@@ -66,8 +66,13 @@ void DcMotor::setPercent(Motor motor, int8_t speed) {
     }
 }
 
-void DcMotor::setPercent(Motor motor, Direction direction, uint8_t speed) {
-	uint16_t rawSpeed = (direction == Direction::Stop) ? 0 : (speed * 41);
+void DcMotor::setPercent(double motorDouble, Direction direction, double speed) {
+	int8_t motorInt = motorDouble - 1;
+	if (motorInt < 0 || motorInt > 3) return;
+	Motor motor = static_cast<Motor>(motorInt);
+
+	uint16_t rawSpeed = (direction == Direction::Stop) ? 0 : (fmin(fmax(speed, -100), 100) * 41);
+
 	setRaw(motor, direction, rawSpeed);
 }
 

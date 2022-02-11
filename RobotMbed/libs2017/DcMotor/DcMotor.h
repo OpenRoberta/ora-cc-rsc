@@ -33,8 +33,8 @@ class DcMotor {
 
     void init();
     void release();
-    void setPercent(Motor motor, int8_t speed);
-    void setPercent(Motor motor, Direction direction, uint8_t speed);
+    void setPercent(double motor, double speed);
+    void setPercent(double motor, Direction direction, double speed);
     void setRaw(Motor motor, Direction direction, uint16_t speed);
     void setSpeed(Motor motor, uint16_t speed);
     void setDirection(Motor motor, Direction direction);
