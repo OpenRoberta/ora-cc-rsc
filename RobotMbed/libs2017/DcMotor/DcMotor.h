@@ -1,7 +1,7 @@
 /*
  * DC Motor Lib
  *
- * Copyright (C) 2021 Christian Poulter
+ * Copyright (C) 2021-2022 Christian Poulter
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,17 +29,19 @@ enum class Motor { M1 = 0, M2 = 1, M3 = 2, M4 = 3 };
 class DcMotor {
 
     public:
-    DcMotor();
+    DcMotor(uint8_t i2cAddress);
 
     void init();
     void release();
-    void set(Motor motor, int8_t speed);
-    void set(Motor motor, Direction direction, uint16_t speed);
+    void setPercent(Motor motor, int8_t speed);
+    void setPercent(Motor motor, Direction direction, uint8_t speed);
+    void setRaw(Motor motor, Direction direction, uint16_t speed);
     void setSpeed(Motor motor, uint16_t speed);
     void setDirection(Motor motor, Direction direction);
 
     private:
     I2C i2c;
+    uint8_t i2cAddress;
 
     void allOff();
     void setPin(uint8_t pin, bool value);
@@ -47,8 +49,6 @@ class DcMotor {
     void writeI2C(uint8_t startreg, uint8_t value1, uint8_t value2, uint8_t value3, uint8_t value4);
 
     static const uint8_t PINS[4][3];
-
-    static const uint8_t I2C_ADDRESS = (0x60 << 1);
 
     static const uint8_t PCA9685_REGISTER_PRESCALE = 0xFE;
     static const uint8_t PCA9685_REGISTER_MODE1 = 0x0;
