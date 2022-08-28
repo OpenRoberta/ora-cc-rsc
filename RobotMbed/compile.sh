@@ -70,6 +70,7 @@ INC="-I${CC_RSC}/microbit \
 -I${CC_RSC}/FourDigitDisplay \
 -I${CC_RSC}/Grove_LED_Bar \
 -I${CC_RSC}/Sht31 \
+-I${CC_RSC}/DcMotor \
 -Isource"
 
 LIBS="${USERPROG_DIR}target/${PROG_NAME}.cpp.o \
@@ -81,7 +82,8 @@ ${CC_RSC}/nrf51-sdk.a \
 ${CC_RSC}/mbed-classic${BLUETOOTH}.a \
 ${CC_RSC}/FourDigitDisplay.a \
 ${CC_RSC}/Grove_LED_Bar.a \
-${CC_RSC}/Sht31.a"
+${CC_RSC}/Sht31.a \
+${CC_RSC}/DcMotor.a"
 
 C_FLAGS="-fno-exceptions -fno-unwind-tables -ffunction-sections -fdata-sections -Wdeprecated -Wno-unused-variable -Wall -Wextra -fno-rtti \
 -fno-threadsafe-statics -mcpu=cortex-m0 -mthumb -D__thumb2__ -std=c++11 -fwrapv -Os -g -gdwarf-3 -DNDEBUG -DTOOLCHAIN_GCC -DTOOLCHAIN_GCC_ARM -DMBED_OPERATORS \
