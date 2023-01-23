@@ -98,7 +98,7 @@ if ! $run; then
 fi
 
 echo "[2/3] Linking CXX executable"
-run="${CC_BIN}arm-none-eabi-g++ ${LD_FLAGS} -T ${CC_RSC}/NRF51822.ld -Wl,-Map,${USERPROG_DIR}target/${PROG_NAME}.map -Wl,--start-group ${LIBS} ${LD_LIBS}--end-group -o ${USERPROG_DIR}target/${PROG_NAME}"
+run="${CC_BIN}arm-none-eabi-g++ ${LD_FLAGS} -T ${CC_RSC}/NRF51822_16K.ld -Wl,-Map,${USERPROG_DIR}target/${PROG_NAME}.map -Wl,--start-group ${LIBS} ${LD_LIBS}--end-group -o ${USERPROG_DIR}target/${PROG_NAME}"
 if ! $run; then
     echo "Error in linking !!!"
     exit 1
