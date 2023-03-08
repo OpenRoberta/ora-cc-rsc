@@ -486,3 +486,18 @@ void _cbSetServo(char buf[5], MicroBitI2C *i2c, char servo, int position) {
     buf[1] = min(max(position, 0), 180);
     i2c->write(_CB_20_ADDR, buf, 2);
 }
+
+template<typename T>
+bool operator== (std::list<T, std::allocator<T>>& list1, std::list<T, std::allocator<T>>& list2) {
+    if (list1.size() != list2.size()) {
+        return false;
+    }
+    auto it1 = list1.begin();
+    auto it2 = list2.begin();
+    for (; it1 != list1.end(); ++it1, ++it2) {
+        if (!(*it1 == *it2)) {
+            return false;
+        }
+    }
+    return true;
+}
