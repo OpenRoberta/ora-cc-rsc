@@ -63,7 +63,7 @@ def main(args):
         hl_parser.reset_devices_and_locations()
         token_assembler.reset_tokens()
 
-        #print(statements)
+        # print(statements)
         dBytes, dString, dType, version = token_assembler.assemble_lines(statements, False)
         print("Size:", len(dBytes), len(dString), dType, version)
         if (len(dBytes) == 0 or dType == 0 or version == 0):
@@ -71,7 +71,7 @@ def main(args):
         elif (not args.checkOnly) and (not args.nowav):
             versionNumber = (version[0] << 4) + version[1]
             versionString = chr(versionNumber) + chr(255 - versionNumber)
-            #print(versionNumber, ord(versionString[0]), ord(versionString[1]), download_type)
+            # print(versionNumber, ord(versionString[0]), ord(versionString[1]), download_type)
 
             if (not args.nowav):
                 absSrcPath = os.path.abspath(args.srcPath.name)
@@ -84,9 +84,9 @@ def main(args):
                 full_download_str = versionString + dString
                 full_download_bytes = [versionNumber, 255 - versionNumber]
                 full_download_bytes.extend(dBytes)
-                #print(len(full_download_bytes))
+                # print(len(full_download_bytes))
 
-                LOG.log("WAV size:{:d} ver:{:d} name:{:s}".format(len(full_download_bytes),
+                LOG.log("WAV size:{} ver:{} name:{}".format(len(full_download_bytes),
                                                                       versionNumber,
                                                                       a.GetWavPath()))
 
@@ -153,11 +153,11 @@ def ProcessCommandArgs(args):
                         help="don't output the wav file")
 
     # TODO: Change defaults back to normal ones for web app
-    parser.add_argument("-o", type=util.LowerStr, default="console",  # default="console",
+    parser.add_argument("-o", type=util.LowerStr, default="json",  # default="console",
                         choices=list(zip(*outputChoices))[0],
                         help="Output location (default:%(default)s)")
     parser.add_argument("-l", type=util.LowerStr,
-                        choices=list(zip(*levelChoices))[0], default="error",  # default="debug",
+                        choices=list(zip(*levelChoices))[0], default="warn",  # default="debug",
                         help="Output level (default:%(default)s). " +
                         "\nAll output from previous levels and this one will be generated")
 
@@ -165,7 +165,7 @@ def ProcessCommandArgs(args):
                         choices=testChoices, help="Special tests. " +
                         "INSTEAD of doing normal processing, do the special test")
 
-    #print("Args:",  args)
+    # print("Args:",  args)
     parsed = parser.parse_args(args)
 
     sinkNumber = [x[1] for x in outputChoices if x[0] == parsed.o][0]
@@ -263,14 +263,14 @@ if __name__ == '__main__':
 
     except Exception as e:
         # if we fail, that's ok - but not good
-        totalOutput += "LOG EXC:{:s}".format(e)
+        totalOutput += "LOG EXC:{}".format(e)
 
 
     if (m is not None):
-        LOG.log("END rtc:{:d} INTERNAL ERROR output:|{:s}|\n".format(rtc, totalOutput))
-        LOG.log("PRG {:s}".format(totalProgram))
+        LOG.log("END rtc:{} INTERNAL ERROR output:|{}|\n".format(rtc, totalOutput))
+        LOG.log("PRG {}".format(totalProgram))
     else:
-        LOG.log("END rtc:{:d} output:|{:s}|\n".format(rtc, totalOutput))
+        LOG.log("END rtc:{} output:|{}|\n".format(rtc, totalOutput))
     LOG.close()
 
     io.Out.Flush()

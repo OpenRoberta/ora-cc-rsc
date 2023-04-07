@@ -56,13 +56,12 @@ else:
 class Output(object):
     """Create a wav file"""
 
-    def __init__(self, dir, nameOverride=""):
+    def __init__(self, dir, nameOverride=None):
         """Create an audio file within a directory (typically creating a new name)"""
         self.directory = dir
-        if nameOverride != "":
+        if nameOverride:
             self.filename = nameOverride
-            self.fileHandle = open(self.filename, "wb+") #to create file
-            self.fileHandle = open(self.filename, "wb") #python wave.py needs file mode "wb", so "wb+" does not work
+            self.fileHandle = open(self.filename, "wb")
         else:
             self.fileHandle = tempfile.NamedTemporaryFile(mode="wb",
                                                           prefix="tok", suffix=".wav",
@@ -196,18 +195,18 @@ class Output(object):
         return data
 
     def createAudioWithPulses(self, midQuantas, sample_rate):
-        data = ""
+        data = b""
         samples_per_quanta = sample_rate / 2000
         total_samples = 2 * samples_per_quanta + (midQuantas * samples_per_quanta)
 
         # write far
-        data += chr(255) + chr(0)
+        data += i2b(255) + i2b(0)
         # write near
-        data += chr(0) + chr(255)
+        data += i2b(0) + i2b(255)
 
         count = 2
         while count < total_samples:
-            data += chr(128) + chr(128)
+            data += i2b(128) + i2b(128)
             count += 1
 
         return data
@@ -217,13 +216,13 @@ class Output(object):
         return self.ramp(128, 128, midQuantas * samples_per_quanta)
 
     def createSilenceWithPulses(self, midQuantas, sample_rate):
-        data = ""
+        data = b""
         samples_per_quanta = sample_rate / 2000
         total_samples = midQuantas * samples_per_quanta
 
         count = 0
         while count < total_samples:
-            data += chr(128) + chr(128)
+            data += i2b(128) + i2b(128)
             count += 1
 
         return data
