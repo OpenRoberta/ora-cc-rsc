@@ -344,6 +344,21 @@
 							<appendAssemblyId>false</appendAssemblyId>
 						</configuration>
 					</execution>
+					<execution>
+						<id>make-assembly-0-0-1</id>
+						<phase>install</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>src/assembly/zip-txt4-resources-0-0-1.xml</descriptor>
+							</descriptors>
+							<outputDirectory>RobotTxt4/updateResources/0-0-1</outputDirectory>
+							<finalName>roberta</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
