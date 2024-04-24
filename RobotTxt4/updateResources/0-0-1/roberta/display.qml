@@ -13,27 +13,27 @@ TXTWindow {
   }
   TXTButton {
     id: buttonLeft
-    text: "<>"
+    text: "<"
     font.pixelSize: 32
     font.bold: true
     font.italic: false
     font.underline: false
     enabled: true
     x: 0
-    y: 175
+    y: 186
     width: 100
     height: 40
   }
   TXTButton {
     id: buttonRight
-    text: "<>"
+    text: ">"
     font.pixelSize: 32
     font.bold: true
     font.italic: false
     font.underline: false
     enabled: true
     x: 140
-    y: 175
+    y: 186
     width: 100
     height: 40
   }
@@ -63,7 +63,7 @@ TXTWindow {
     color: "#ffffff"
     elide: Text.ElideRight
     x: 0
-    y: 20
+    y: 23
     width: 240
     height: 20
   }
@@ -78,7 +78,7 @@ TXTWindow {
     color: "#ffffff"
     elide: Text.ElideRight
     x: 0
-    y: 40
+    y: 46
     width: 240
     height: 20
   }
@@ -93,7 +93,7 @@ TXTWindow {
     color: "#ffffff"
     elide: Text.ElideRight
     x: 0
-    y: 60
+    y: 69
     width: 240
     height: 20
   }
@@ -108,7 +108,7 @@ TXTWindow {
     color: "#ffffff"
     elide: Text.ElideRight
     x: 0
-    y: 80
+    y: 92
     width: 240
     height: 20
   }
@@ -123,7 +123,7 @@ TXTWindow {
     color: "#ffffff"
     elide: Text.ElideRight
     x: 0
-    y: 100
+    y: 115
     width: 240
     height: 20
   }
@@ -138,7 +138,7 @@ TXTWindow {
     color: "#ffffff"
     elide: Text.ElideRight
     x: 0
-    y: 120
+    y: 138
     width: 240
     height: 20
   }
@@ -153,7 +153,7 @@ TXTWindow {
     color: "#ffffff"
     elide: Text.ElideRight
     x: 0
-    y: 140
+    y: 161
     width: 240
     height: 20
   }
@@ -162,7 +162,7 @@ TXTWindow {
     color: "#000000"
     active: false
     x: 100
-    y: 175
+    y: 186
     width: 40
     height: 40
   }
@@ -171,7 +171,7 @@ TXTWindow {
     color: "#FFFFFF"
     active: false
     x: 100
-    y: 175
+    y: 186
     width: 40
     height: 40
   }
@@ -180,7 +180,7 @@ TXTWindow {
     color: "#CC33CC"
     active: false
     x: 100
-    y: 175
+    y: 186
     width: 40
     height: 40
   }
@@ -189,7 +189,7 @@ TXTWindow {
     color: "#3366FF"
     active: false
     x: 100
-    y: 175
+    y: 186
     width: 40
     height: 40
   }
@@ -198,7 +198,7 @@ TXTWindow {
     color: "#33FFFF"
     active: false
     x: 100
-    y: 175
+    y: 186
     width: 40
     height: 40
   }
@@ -207,7 +207,7 @@ TXTWindow {
     color: "#33CC00"
     active: false
     x: 100
-    y: 175
+    y: 186
     width: 40
     height: 40
   }
@@ -216,7 +216,7 @@ TXTWindow {
     color: "#FFFF00"
     active: false
     x: 100
-    y: 175
+    y: 186
     width: 40
     height: 40
   }
@@ -225,7 +225,7 @@ TXTWindow {
     color: "#CC0000"
     active: false
     x: 100
-    y: 175
+    y: 186
     width: 40
     height: 40
   }
