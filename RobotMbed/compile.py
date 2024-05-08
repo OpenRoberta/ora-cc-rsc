@@ -1,15 +1,14 @@
-import os
-import struct
-import binascii
-import sys
 import argparse
+import binascii
+import struct
+import sys
 from pathlib import Path
 
 _MAX_SIZE_V1 = 8188
 _SCRIPT_ADDR = 0x3e000
 
 MICROPYTHON_V1_VERSION = '1.0.1'
-MICROPYTHON_V2_VERSION = '2.0.0-beta.5'
+MICROPYTHON_V2_VERSION = '2.1.2'
 
 #: Filesystem boundaries, this might change with different MicroPython builds.
 _MICROBIT_ID_V1 = '9900'
@@ -133,14 +132,14 @@ def bytes_to_ihex(addr, data, universal_data_record=False):
         addr += 16
     return '\n'.join(output)
 
-def script_to_fs(script, microbit_version_id):
+def script_to_fs(script):
     """
     Convert a Python script (in bytes format) into Intel Hex records, which
     location is configured within the micro:bit MicroPython filesystem and the
     data is encoded in the filesystem format.
 
     For more info:
-    https://github.com/bbcmicrobit/micropython/blob/v1.0.1/source/microbit/filesystem.c
+     https://github.com/bbcmicrobit/micropython/blob/v1.0.1/source/microbit/filesystem.c
     """
     if not script:
         return ''
@@ -149,19 +148,9 @@ def script_to_fs(script, microbit_version_id):
     script = script.replace(b'\r\n', b'\n')
     script = script.replace(b'\r', b'\n')
 
-    # Find fs boundaries based on micro:bit version ID
-    if microbit_version_id == _MICROBIT_ID_V1:
-        fs_start_address = _FS_START_ADDR_V1
-        fs_end_address = _FS_END_ADDR_V1
-        universal_data_record = False
-    elif microbit_version_id == _MICROBIT_ID_V2:
-        fs_start_address = _FS_START_ADDR_V2
-        fs_end_address = _FS_END_ADDR_V2
-        universal_data_record = True
-    else:
-        raise ValueError(
-            'Incompatible micro:bit ID found: {}'.format(microbit_version_id)
-        )
+    fs_start_address = _FS_START_ADDR_V2
+    fs_end_address = _FS_END_ADDR_V2
+    universal_data_record = True
 
     chunk_size = 128       # Filesystem chunks configure in MP to 128 bytes
     chunk_data_size = 126  # 1st & last bytes are the prev/next chunk pointers
@@ -219,7 +208,7 @@ def script_to_fs(script, microbit_version_id):
         scratch_ihex = scratch_ihex[ela_record_len:]
     return fs_ihex + "\n" + scratch_ihex + "\n"
 
-def embed_fs_uhex(universal_hex_str, python_code=None):
+def embed_fs_uhex(runtime_hex, python_code=None):
     """
     Given a string representing a MicroPython Universal Hex, it will embed a
     Python script encoded into the MicroPython filesystem for each of the
@@ -235,57 +224,25 @@ def embed_fs_uhex(universal_hex_str, python_code=None):
     format.
 
     If the python_code is missing, it will return the unmodified
-    universal_hex_str.
+    runtime_hex.
     """
     if not python_code:
-        return universal_hex_str
+        return runtime_hex
     python_code = strfunc(python_code)
-    # First let's separate the Universal Hex into the individual sections,
-    # Each section starts with an Extended Linear Address record (:02000004...)
-    # followed by s Block Start record (:0400000A...)
-    # We only expect two sections, one for V1 and one for V2
-    section_start = ':020000040000FA\n:0400000A'
-    second_section_i = universal_hex_str[len(section_start):].find(
-        section_start
-    ) + len(section_start)
-    uhex_sections = [
-        universal_hex_str[:second_section_i],
-        universal_hex_str[second_section_i:],
-    ]
 
-    # Now for each section we add the Python code to the filesystem
-    full_uhex_with_fs = ''
-    for section in uhex_sections:
-        # Block Start record starts like this, followed by device ID (4 chars)
-        block_start_record_start = ':0400000A'
-        block_start_record_i = section.find(block_start_record_start)
-        device_id_i = block_start_record_i + len(block_start_record_start)
-        device_id = section[device_id_i:device_id_i + 4]
-        # With the device ID we can encode the fs into hex records to inject
-        fs_hex = script_to_fs(python_code, device_id)
-        fs_hex = pad_hex_string(fs_hex)
-        # In all Sections the fs will be placed at the end of the hex, right
-        # before the UICR, this is for compatibility with all DAPLink versions.
-        # V1 memory layout in sequential order: MicroPython + fs + UICR
-        # V2: SoftDevice + MicroPython + regions table + fs + bootloader + UICR
-        # V2 can manage the hex out of order, but some DAPLink versions in V1
-        # need the hex contents to be in order. So in V1 the fs can never go
-        # after the UICR (flash starts at address 0x0, UICR at 0x1000_0000),
-        # but placing it before should be compatible with all versions.
-        # We find the UICR records in the hex file by looking for an Extended
-        # Linear Address record with value 0x1000 (:020000041000EA).
-        uicr_i = section.rfind(':020000041000EA')
-        # In some cases an Extended Linear/Segmented Address record to 0x0000
-        # is present as part of UICR address jump, so take it into account.
-        ela_record = ':020000040000FA\n'
-        if section[:uicr_i].endswith(ela_record):
-            uicr_i -= len(ela_record)
-        esa_record = ':020000020000FC\n'
-        if section[:uicr_i].endswith(esa_record):
-            uicr_i -= len(esa_record)
-        # Now we know where to inject the fs hex block
-        full_uhex_with_fs += section[:uicr_i] + fs_hex + section[uicr_i:]
-    return full_uhex_with_fs
+    # For the V2 section we add the Python code to the filesystem
+    fs_hex = script_to_fs(python_code)
+    fs_hex = pad_hex_string(fs_hex)
+    # In all Sections the fs will be placed at the end of the hex, right
+    # before the UICR, this is for compatibility with all DAPLink versions.
+    # V2: SoftDevice + MicroPython + regions table + fs + bootloader + UICR
+    # V2 can manage the hex out of order.
+    # We find the UICR records in the hex file by looking for an Extended
+    # Linear Address record with value 0x1000 (:020000041000EA).
+    uicr_i = runtime_hex.rfind(':020000041000EA')
+    # Now we know where to inject the fs hex block
+    return runtime_hex[:uicr_i] + fs_hex + runtime_hex[uicr_i:]
+
 
 def embed_hex(runtime_hex, python_hex=None):
     """
@@ -380,7 +337,6 @@ def main(argv=None):
             "Error compiling: {ex}"
         )
         sys.exit(1)
-
 
 if __name__ == '__main__':
     main(sys.argv[1:])
