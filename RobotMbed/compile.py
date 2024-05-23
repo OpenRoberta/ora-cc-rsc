@@ -33,13 +33,36 @@ def compile(python_script, runtime_hex_path, robot_type, path_to_store):
     elif robot_type == "microbit-v2":
         micropython_hex = embed_fs_uhex(hexScript, bytefunc(python_script))
     elif robot_type == "calliope-v3":
-        micropython_hex = embed_fs_uhex(hexScript, bytefunc(python_script))
+        lib_path = Path(runtime_hex_path)/"pythonLibraries"
+        combined_script = import_external_libraries(lib_path, python_script)
+        micropython_hex = embed_fs_uhex(hexScript, bytefunc(combined_script))
     else:
         print("Error in robot type parameter")
         sys.exit(1)
     if not path_to_store:
         print(micropython_hex)
     # path_to_store for later use, storing the hex in the file system like other token based plugins do
+
+def import_external_libraries(lib_path, python_script):
+    ultrasonic_import = "from ultrasonic import Ultrasonic"
+    tm1637_import = "from tm1637 import TM1637"
+    lib_scripts = []
+    if ultrasonic_import in python_script:
+        try:
+            ultrasonic_lib = (lib_path/"ultrasonic.py").read_text()
+        except Exception as e:
+            print("An unexpected error occurred:", e)
+
+        python_script = python_script.replace(ultrasonic_import, ultrasonic_lib)
+
+    if tm1637_import in python_script:
+        try:
+            tm1637_lib = (lib_path/"tm1637.py").read_text()
+        except Exception as e:
+            print("An unexpected error occurred:", e)
+
+        python_script = python_script.replace(tm1637_import, tm1637_lib)
+    return python_script
 
 def bytefunc(raw):
     """
