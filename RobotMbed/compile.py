@@ -3,6 +3,8 @@ import binascii
 import struct
 import sys
 from pathlib import Path
+import ast
+import os
 
 _MAX_SIZE_V1 = 8188
 _SCRIPT_ADDR = 0x3e000
@@ -33,13 +35,52 @@ def compile(python_script, runtime_hex_path, robot_type, path_to_store):
     elif robot_type == "microbit-v2":
         micropython_hex = embed_fs_uhex(hexScript, bytefunc(python_script))
     elif robot_type == "calliope-v3":
-        micropython_hex = embed_fs_uhex(hexScript, bytefunc(python_script))
+        lib_path = Path(runtime_hex_path)/"pythonLibraries"
+        combined_script = import_external_libraries(lib_path, python_script)
+        micropython_hex = embed_fs_uhex(hexScript, bytefunc(combined_script))
     else:
         print("Error in robot type parameter")
         sys.exit(1)
     if not path_to_store:
         print(micropython_hex)
     # path_to_store for later use, storing the hex in the file system like other token based plugins do
+
+def import_external_libraries(lib_path, python_script):
+    import_map = extract_imported_imports_and_filenames(python_script)
+    for import_statement, filename in import_map.items():
+        file_path = get_file_path_from_filename(lib_path, filename)
+        if not file_path:
+            continue
+        python_script = replace_import_by_file_content(
+            file_path, python_script, import_statement
+        )
+    return python_script
+
+def extract_imported_imports_and_filenames(python_script):
+    import_map = {}
+    tree = ast.parse(python_script)
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if node.module:
+                module_name = node.module.split(".")[0]
+                import_statement = f"from {node.module} import {', '.join(name.name for name in node.names)}"
+                import_map[import_statement] = module_name
+
+    return import_map
+
+def get_file_path_from_filename(lib_path, filename):
+    filename = filename + ".py"
+    file_path = os.path.join(lib_path, filename)
+
+    if os.path.isfile(file_path):
+        return file_path
+    return ""
+
+def replace_import_by_file_content(lib_path, python_script, import_statement):
+    file_content = Path(lib_path).read_text()
+    updated_script = python_script.replace(import_statement, file_content)
+    return updated_script
 
 def bytefunc(raw):
     """
