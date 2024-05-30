@@ -3,6 +3,8 @@ import binascii
 import struct
 import sys
 from pathlib import Path
+import ast
+import os
 
 _MAX_SIZE_V1 = 8188
 _SCRIPT_ADDR = 0x3e000
@@ -44,25 +46,46 @@ def compile(python_script, runtime_hex_path, robot_type, path_to_store):
     # path_to_store for later use, storing the hex in the file system like other token based plugins do
 
 def import_external_libraries(lib_path, python_script):
-    ultrasonic_import = "from ultrasonic import Ultrasonic"
-    tm1637_import = "from tm1637 import TM1637"
-    lib_scripts = []
-    if ultrasonic_import in python_script:
-        try:
-            ultrasonic_lib = (lib_path/"ultrasonic.py").read_text()
-        except Exception as e:
-            print("An unexpected error occurred:", e)
-
-        python_script = python_script.replace(ultrasonic_import, ultrasonic_lib)
-
-    if tm1637_import in python_script:
-        try:
-            tm1637_lib = (lib_path/"tm1637.py").read_text()
-        except Exception as e:
-            print("An unexpected error occurred:", e)
-
-        python_script = python_script.replace(tm1637_import, tm1637_lib)
+    import_map = extract_imported_imports_and_filenames(python_script)
+    for import_statement, filename in import_map.items():
+        file_path = get_file_path_from_filename(lib_path, filename)
+        if not file_path:
+            continue
+        python_script = replace_import_by_file_content(
+            file_path, python_script, import_statement
+        )
     return python_script
+
+def extract_imported_imports_and_filenames(python_script):
+    import_map = {}
+    tree = ast.parse(python_script)
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            if node.module:
+                module_name = node.module.split(".")[0]
+                import_statement = f"from {node.module} import {', '.join(name.name for name in node.names)}"
+                import_map[import_statement] = module_name
+        elif isinstance(node, ast.Import):
+            for name in node.names:
+                module_name = name.name.split(".")[0]
+                import_statement = f"import {name.name}"
+                import_map[import_statement] = module_name
+
+    return import_map
+
+def get_file_path_from_filename(lib_path, filename):
+    filename = filename + ".py"
+    file_path = os.path.join(lib_path, filename)
+
+    if os.path.isfile(file_path):
+        return file_path
+    return ""
+
+def replace_import_by_file_content(lib_path, python_script, import_statement):
+    file_content = Path(lib_path).read_text()
+    updated_script = python_script.replace(import_statement, file_content)
+    return updated_script
 
 def bytefunc(raw):
     """
