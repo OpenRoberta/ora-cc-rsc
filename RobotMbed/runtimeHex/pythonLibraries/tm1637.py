@@ -131,11 +131,11 @@ class TM1637(object):
 			self.write(self.encode_string(string))
 		self.write([_SEG[38], _SEG[12]], 2) # degrees C
 
-	def show(self, string, colon=False):
+	def show(self, string, pos=0, colon=False):
 		segments = self.encode_string(string)
 		if len(segments) > 1 and colon:
 			segments[1] |= 128
-		self.write(segments[:4])
+		self.write(segments[:4], pos)
 
 	def scroll(self, string, delay=250):
 		segments = string if isinstance(string, list) else self.encode_string(string)
@@ -144,3 +144,5 @@ class TM1637(object):
 		for i in range(len(segments) + 5):
 			self.write(data[0+i:4+i])
 			sleep(delay)
+	def clear(self):
+		self.show("    ")
