@@ -66,11 +66,6 @@ def extract_imported_imports_and_filenames(python_script):
                 module_name = node.module.split(".")[0]
                 import_statement = f"from {node.module} import {', '.join(name.name for name in node.names)}"
                 import_map[import_statement] = module_name
-        elif isinstance(node, ast.Import):
-            for name in node.names:
-                module_name = name.name.split(".")[0]
-                import_statement = f"import {name.name}"
-                import_map[import_statement] = module_name
 
     return import_map
 
