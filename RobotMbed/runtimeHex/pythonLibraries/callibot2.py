@@ -120,6 +120,20 @@ class Callibot2(object):
 
         self.stop_motor_l()
         self.stop_motor_r()
+    # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Servo
+    def servo(self, nr, pos):
+        buffer = bytearray(2)
+        pos = max(0, min(180, pos))
+        if nr == 1:  # Servo1
+            buffer[0] = 0x14
+        elif nr == 2:  # Servo2
+            buffer[0] = 0x15
+
+        buffer[1] = pos
+
+        i2c.write(self.i2cAdrMotoren, buffer)
+
 
     # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     # vordere rote LED-Funktionen
@@ -134,11 +148,13 @@ class Callibot2(object):
             self.set_red_led_left_on()
         else:
             self.set_red_led_right_on()
+            
     def set_red_led_off(self, led):
         if led == 1:
             self.set_red_led_left_off()
         else:
             self.set_red_led_right_off()
+            
     def set_red_led_left_on(self):
         """Schaltet linke rote LED ein."""
 
