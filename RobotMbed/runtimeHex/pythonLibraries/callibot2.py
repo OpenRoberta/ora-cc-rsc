@@ -125,10 +125,10 @@ class Callibot2(object):
     def servo(self, nr, pos):
         buffer = bytearray(2)
         pos = max(0, min(180, pos))
-        if nr == 1:  # Servo1
-            buffer[0] = 0x14
-        elif nr == 2:  # Servo2
+        if nr == 1:  # Servo left
             buffer[0] = 0x15
+        elif nr == 2:  # Servo right
+            buffer[0] = 0x14
 
         buffer[1] = pos
 
