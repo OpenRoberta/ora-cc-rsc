@@ -384,6 +384,12 @@ bool _cbGetSampleInfrared(char buf[5], MicroBitI2C *i2c, uint8_t sensor) {
 	return ((buf[0] &= sensor) == 0 ? true : false);
 }
 
+bool _cbGetSampleBumperKey(char buf[5], MicroBitI2C *i2c, uint8_t sensor) {
+	i2c->read(_CB_21_ADDR, buf, 1);
+        buf[0] &= (sensor == 1) ? 0x08 : (sensor == 2) ? 0x04 : 0x00;
+        return buf[0] != 0;
+}
+
 ManagedString _castColorToString(MicroBitColor color) {
 	return (ManagedString("RGBW(") + color.getRed() + ManagedString(", ")
 			+ color.getGreen() + ManagedString(", ") + color.getBlue()
