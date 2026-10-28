@@ -37,6 +37,9 @@ def compile(python_script, runtime_hex_path, robot_type, path_to_store):
     elif robot_type == "calliope-v3":
         lib_path = Path(runtime_hex_path)/"pythonLibraries"
         combined_script = import_external_libraries(lib_path, python_script)
+        # Partial flashing clients (e.g. the Calliope apps) locate the runtime, the region table and the DAL hash
+        # by absolute address and only understand extended linear address records (type 04).
+        hexScript = normalize_to_linear_addressing(hexScript)
         micropython_hex = embed_fs_uhex(hexScript, bytefunc(combined_script))
     else:
         print("Error in robot type parameter")
@@ -44,6 +47,50 @@ def compile(python_script, runtime_hex_path, robot_type, path_to_store):
     if not path_to_store:
         print(micropython_hex)
     # path_to_store for later use, storing the hex in the file system like other token based plugins do
+
+def normalize_to_linear_addressing(runtime_hex):
+    """
+    Rewrites an Intel Hex string so that it only uses extended linear address records (type 04).
+
+    The Calliope mini V3 runtime hex addresses most of its content (SoftDevice, MicroPython/DAL) with extended
+    segment address records (type 02). Both notations describe the same memory image, but partial flashing
+    clients only evaluate type 04 records when they search for the region table and the DAL hash. With type 02
+    records the runtime is seen at wrong addresses and the hex is not recognised as partially flashable.
+
+    The memory image is not changed. Segment address records are replaced by linear address records, all other
+    records are kept in their original order.
+    """
+    output = []
+    base = 0  # absolute base address set by the last type 02 or type 04 record
+    emitted_high = 0  # upper 16 address bits announced to the reader by the last emitted type 04 record
+    for line in runtime_hex.splitlines():
+        line = line.strip()
+        if not line.startswith(':'):
+            output.append(line)
+            continue
+        record = bytes.fromhex(line[1:])
+        length, offset, rtype = record[0], (record[1] << 8) | record[2], record[3]
+        data = record[4:4 + length]
+        if rtype == 0x02:
+            base = int.from_bytes(data, 'big') << 4
+        elif rtype == 0x04:
+            base = int.from_bytes(data, 'big') << 16
+            emitted_high = base >> 16
+            output.append(line)
+        elif rtype == 0x00:
+            absolute = base + offset
+            if (absolute >> 16) != ((absolute + length - 1) >> 16):
+                raise ValueError("data record at {:#x} crosses a 64 KiB boundary".format(absolute))
+            if (absolute >> 16) != emitted_high:
+                emitted_high = absolute >> 16
+                ela = struct.pack('>BHBH', 0x02, 0x0000, 0x04, emitted_high)
+                output.append(':%s%02X' % (strfunc(binascii.hexlify(ela)).upper(), (-sum(ela)) & 0xff))
+            # the record offset is relative to the linear base, not to the old segment base
+            relocated = struct.pack('>BHB', length, absolute & 0xffff, 0x00) + data
+            output.append(':%s%02X' % (strfunc(binascii.hexlify(relocated)).upper(), (-sum(relocated)) & 0xff))
+        else:
+            output.append(line)
+    return '\n'.join(output) + '\n'
 
 def import_external_libraries(lib_path, python_script):
     import_map = extract_imported_imports_and_filenames(python_script)
