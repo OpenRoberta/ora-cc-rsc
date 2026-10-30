@@ -40,7 +40,9 @@ def compile(python_script, runtime_hex_path, robot_type, path_to_store):
         # Partial flashing clients (e.g. the Calliope apps) locate the runtime, the region table and the DAL hash
         # by absolute address and only understand extended linear address records (type 04).
         hexScript = normalize_to_linear_addressing(hexScript)
-        micropython_hex = embed_fs_uhex(hexScript, bytefunc(combined_script))
+        # The scratch page marker is left out: partial flashing clients send every record as a 16 byte packet and
+        # write the packets of a block consecutively, so the 1 byte record behind the filesystem corrupts it.
+        micropython_hex = embed_fs_uhex(hexScript, bytefunc(combined_script), scratch_marker=False)
     else:
         print("Error in robot type parameter")
         sys.exit(1)
@@ -220,7 +222,7 @@ def bytes_to_ihex(addr, data, universal_data_record=False):
         addr += 16
     return '\n'.join(output)
 
-def script_to_fs(script):
+def script_to_fs(script, scratch_marker=True):
     """
     Convert a Python script (in bytes format) into Intel Hex records, which
     location is configured within the micro:bit MicroPython filesystem and the
@@ -286,6 +288,8 @@ def script_to_fs(script):
     # For Python2 compatibility we need to explicitly convert to bytes
     data = b''.join([bytes(c) for c in chunks])
     fs_ihex = bytes_to_ihex(fs_start_address, data, universal_data_record)
+    if not scratch_marker:
+        return fs_ihex + "\n"
     # Add this byte after the fs flash area to configure the scratch page there
     scratch_ihex = bytes_to_ihex(
         fs_end_address, b"\xfd", universal_data_record
@@ -296,7 +300,7 @@ def script_to_fs(script):
         scratch_ihex = scratch_ihex[ela_record_len:]
     return fs_ihex + "\n" + scratch_ihex + "\n"
 
-def embed_fs_uhex(runtime_hex, python_code=None):
+def embed_fs_uhex(runtime_hex, python_code=None, scratch_marker=True):
     """
     Given a string representing a MicroPython Universal Hex, it will embed a
     Python script encoded into the MicroPython filesystem for each of the
@@ -313,13 +317,15 @@ def embed_fs_uhex(runtime_hex, python_code=None):
 
     If the python_code is missing, it will return the unmodified
     runtime_hex.
+
+    The 1 byte scratch page marker behind the filesystem is only written if scratch_marker is set.
     """
     if not python_code:
         return runtime_hex
     python_code = strfunc(python_code)
 
     # For the V2 section we add the Python code to the filesystem
-    fs_hex = script_to_fs(python_code)
+    fs_hex = script_to_fs(python_code, scratch_marker)
     fs_hex = pad_hex_string(fs_hex)
     # In all Sections the fs will be placed at the end of the hex, right
     # before the UICR, this is for compatibility with all DAPLink versions.

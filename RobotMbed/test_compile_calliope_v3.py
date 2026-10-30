@@ -75,11 +75,12 @@ class CalliopeV3HexTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         runtime = RUNTIME_HEX.read_text()
+        cls.runtime_text = compiler.normalize_to_linear_addressing(runtime)
         cls.runtime_image = memory_image(runtime)
         cls.runtime_linear_view = memory_image(runtime, linear_only=True)
         program = "from calliopemini import *\nprint('hello')\n"
         script = compiler.import_external_libraries(RUNTIME_DIR / "pythonLibraries", program)
-        cls.hex = compiler.embed_fs_uhex(compiler.normalize_to_linear_addressing(runtime), compiler.bytefunc(script))
+        cls.hex = compiler.embed_fs_uhex(compiler.normalize_to_linear_addressing(runtime), compiler.bytefunc(script), scratch_marker=False)
         cls.linear_view = memory_image(cls.hex, linear_only=True)
 
     def test_original_runtime_is_misread_by_linear_only_clients(self):
@@ -104,6 +105,17 @@ class CalliopeV3HexTest(unittest.TestCase):
         fs = bytes(self.linear_view.get(a, 0xFF) for a in range(0x6D000, 0x6D000 + 256))
         self.assertIn(b"main.py", fs)
         self.assertIn(b"print('hello')", fs)
+
+    def test_filesystem_has_no_scratch_marker_record(self):
+        # partial flashing clients send each record as a 16 byte packet; a 1 byte record at 0x72000 corrupts the program
+        self.assertNotIn(0x72000, self.linear_view)
+        fs_records = [d for rtype, _, d, _ in records(self.hex) if rtype == 0x0D]
+        self.assertTrue(fs_records)
+        self.assertEqual({len(d) for d in fs_records}, {16})
+
+    def test_scratch_marker_is_still_available_for_other_robots(self):
+        with_marker = compiler.embed_fs_uhex(self.runtime_text, b"x = 1\n")
+        self.assertEqual(memory_image(with_marker, linear_only=True).get(0x72000), 0xFD)
 
 
 if __name__ == "__main__":
